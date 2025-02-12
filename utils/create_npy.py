@@ -46,4 +46,4 @@ def create_npy_dataset(cars_root_dir, output_filename):
 
 
 # 使用示例
-create_npy_dataset('../datasets/standforddogs', '../data/dogs_train_data.npy')
+create_npy_dataset('../datasets/cub', '../data/birds_train_data.npy')

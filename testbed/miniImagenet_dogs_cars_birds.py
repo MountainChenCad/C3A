@@ -154,8 +154,8 @@ if __name__ == '__main__':
             'support_filename': '../data/miniImageNet_train_data.npy',
             'target1_name': 'french_bulldog',
             'target2_name': 'tank',
-            # 'target3_name': 'french_bulldog',
-            # 'target4_name': 'tank',
+            'target3_name': 'house_finch',
+            'target4_name': 'jellyfish',
             # 'target5_name': 'french_bulldog',
             'target1_label': 'n02108915',
             'target2_label': 'n04389033',
@@ -165,15 +165,45 @@ if __name__ == '__main__':
         },
         'dogs': {
             'query_filename': '../',
-            'support_filename': '../'
+            'support_filename': '../',
+            'target1_name': 'french_bulldog',
+            'target2_name': 'tank',
+            # 'target3_name': 'french_bulldog',
+            # 'target4_name': 'tank',
+            # 'target5_name': 'french_bulldog',
+            'target1_label': 'n02108915',
+            'target2_label': 'n04389033',
+            'target3_label': 'n01532829',
+            'target4_label': 'n01910747',
+            'target5_label': 'n02113712',
         },
         'cars': {
             'query_filename': '../',
-            'support_filename': '../'
+            'support_filename': '../',
+            'target1_name': 'Rolls-Royce Phantom Sedan 2012',
+            'target2_name': 'Buick Rainier SUV 2007',
+            'target3_name': 'Ford Focus Sedan 2007',
+            'target4_name': 'Chevrolet TrailBlazer SS 2009',
+            'target5_name': 'Audi S4 Sedan 2012',
+            'target1_label': '177',
+            'target2_label': '48',
+            'target3_label': '115',
+            'target4_label': '68',
+            'target5_label': '23',
         },
         'birds': {
             'query_filename': '../',
-            'support_filename': '../'
+            'support_filename': '../',
+            'target1_name': 'french_bulldog',
+            'target2_name': 'tank',
+            # 'target3_name': 'french_bulldog',
+            # 'target4_name': 'tank',
+            # 'target5_name': 'french_bulldog',
+            'target1_label': 'n02108915',
+            'target2_label': 'n04389033',
+            'target3_label': 'n01532829',
+            'target4_label': 'n01910747',
+            'target5_label': 'n02113712',
         }
     }
     if dataset_str in dataset_map:
@@ -191,6 +221,8 @@ if __name__ == '__main__':
         raise ValueError(f"Dataset {dataset_str} is not recognized.")
 
     ### Immediately we load the query and support data here.
+    query_dict = pickle.load(open(query_filename, 'rb'))
+    print_dict_info(query_dict)
     query_pickle = np.expand_dims(
         preprocess_input(
             pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}']),
@@ -205,8 +237,6 @@ if __name__ == '__main__':
     'n13133613', indicating that all images belong to the several different categories.
     '''
     support_data, support_labels = support_dict['data'], support_dict['labels']
-    print_ndarray_info(support_data)
-    print_ndarray_info(support_labels)
     support_data_target1, support_data_target2 = (resize_the_batch(
         preprocess_input(support_data[support_labels == target1_label][:shot])),
                                                   resize_the_batch(
