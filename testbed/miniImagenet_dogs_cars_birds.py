@@ -111,7 +111,7 @@ def print_dict_info(dictionary):
 if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
-    shot = 5
+    shot = 1
     dataset_str = 'cars'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
@@ -300,7 +300,7 @@ if __name__ == '__main__':
     c3a_target2_fidelity_plus, c3a_target2_fidelity_minus = embed.fidelity_scores(
         episode_support_data, query,
         resize_the_batch(np.expand_dims(c3a_target2_plus_image, axis=0)),
-        resize_the_batch(np.expand_dims(c3a_target2_minus_image, axis=0)), idx=0)
+        resize_the_batch(np.expand_dims(c3a_target2_minus_image, axis=0)), idx=1)
     print(f'C3A_{target1_name} -> Fidelity+:{c3a_target1_fidelity_plus}, Fidelity-:{c3a_target1_fidelity_minus}')
     print(f'C3A_{target2_name} -> Fidelity+:{c3a_target2_fidelity_plus}, Fidelity-:{c3a_target2_fidelity_minus}')
     #
