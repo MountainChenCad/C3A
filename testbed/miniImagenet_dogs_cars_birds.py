@@ -113,13 +113,13 @@ if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
     shot = 5
-
+    dataset_str = 'cars'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
     # input_model_str = 'ResNet12'
     model_map = {
         'Conv64F': {
-            'model_filename': '../supplementry_materials/weights/checkpoint.imagenet2019_protonet_augmentation_2025_01_28_21_48_38.h5',
+            'model_filename': f'../supplementry_materials/weights/conv4_{dataset_str}.h5',
             'feature_layer': -5,
             'flatten_layer': -2,
             'encoder_type': 'conv64F',
@@ -127,7 +127,7 @@ if __name__ == '__main__':
             'last_conv_name': 'conv2d_3'
         },
         'ResNet12': {
-            'model_filename': '../protonet_tf2/results/mini-imagenet/protonet/checkpoints/checkpoint.imagenet2019_resnet12_vanilla_2025_02_03-12_38_05_2.h5',
+            'model_filename': f'../supplementry_materials/weights/resnet12_{dataset_str}.h5',
             # Load model if needed
             'feature_layer': -4,
             'encoder_type': 'resnet12'
@@ -145,7 +145,6 @@ if __name__ == '__main__':
         raise ValueError(f"Model {input_model_str} is not recognized.")
 
     ### Note that miniImagenet, dogs, cars, and birds are applicable to this testbed.
-    dataset_str = 'miniImagenet'
     save_dir = f"./results/{dataset_str}_feature_attribution_map"
     os.makedirs(save_dir, exist_ok=True)
     dataset_map = {
@@ -156,7 +155,7 @@ if __name__ == '__main__':
             'target2_name': 'tank',
             'target3_name': 'house_finch',
             'target4_name': 'jellyfish',
-            # 'target5_name': 'french_bulldog',
+            'target5_name': 'miniature_poodle',
             'target1_label': 'n02108915',
             'target2_label': 'n04389033',
             'target3_label': 'n01532829',
@@ -164,8 +163,8 @@ if __name__ == '__main__':
             'target5_label': 'n02113712',
         },
         'dogs': {
-            'query_filename': '../',
-            'support_filename': '../',
+            'query_filename': '../data/.pkl',
+            'support_filename': '../data/dogs_train_data.npy',
             'target1_name': 'french_bulldog',
             'target2_name': 'tank',
             # 'target3_name': 'french_bulldog',
@@ -178,13 +177,13 @@ if __name__ == '__main__':
             'target5_label': 'n02113712',
         },
         'cars': {
-            'query_filename': '../',
-            'support_filename': '../',
-            'target1_name': 'Rolls-Royce Phantom Sedan 2012',
-            'target2_name': 'Buick Rainier SUV 2007',
-            'target3_name': 'Ford Focus Sedan 2007',
-            'target4_name': 'Chevrolet TrailBlazer SS 2009',
-            'target5_name': 'Audi S4 Sedan 2012',
+            'query_filename': '../data/rolls_and_buick.pkl',
+            'support_filename': '../data/cars_train_data.npy',
+            'target1_name': 'rolls',
+            'target2_name': 'buick',
+            'target3_name': 'ford',
+            'target4_name': 'chevrolet',
+            'target5_name': 'audi',
             'target1_label': '177',
             'target2_label': '48',
             'target3_label': '115',
@@ -192,8 +191,8 @@ if __name__ == '__main__':
             'target5_label': '23',
         },
         'birds': {
-            'query_filename': '../',
-            'support_filename': '../',
+            'query_filename': '../data/',
+            'support_filename': '../data/birds_train_data.npy',
             'target1_name': 'french_bulldog',
             'target2_name': 'tank',
             # 'target3_name': 'french_bulldog',
