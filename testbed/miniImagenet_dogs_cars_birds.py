@@ -35,9 +35,6 @@ def model_wrapper(images):
     Assumes images input shape is (batch_size, 84, 84, 3).
     Returns predictions with shape (batch_size, class_number).
     """
-    # Convert grayscale to RGB if the image has only 2 dimensions
-    if len(images.shape) == 2:
-        images = gray2rgb(images)  # Ensure that gray images are converted
     # Expand dimensions to match model input requirements
     query = tf.cast(np.expand_dims(images, axis=0), tf.float32)
     support = tf.cast(episode_support_data, tf.float32)
