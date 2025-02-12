@@ -142,7 +142,7 @@ class C3Amodel:
 
         return score_matrix
 
-    def image_feature_attribution_c3a(self, support_data_1, support_data_2, query, ref_pixel, pad=4, alpha=0.5, progress_bar=True):
+    def image_feature_attribution_c3a(self, support_data_1, support_data_2, query, ref_pixel, pad=2, alpha=0.5, progress_bar=True):
         rows = np.shape(query)[1]
         cols = np.shape(query)[2]
         chnls = np.shape(query)[3]
