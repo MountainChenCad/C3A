@@ -112,7 +112,7 @@ if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
     shot = 1
-    dataset_str = 'cars'
+    dataset_str = 'birds'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
     # input_model_str = 'ResNet12'
@@ -190,18 +190,18 @@ if __name__ == '__main__':
             'target5_label': '23',
         },
         'birds': {
-            'query_filename': '../data/',
+            'query_filename': '../data/pied_kingfisher_and_savannah_sparrow.pkl',
             'support_filename': '../data/birds_train_data.npy',
-            'target1_name': 'french_bulldog',
-            'target2_name': 'tank',
-            # 'target3_name': 'french_bulldog',
-            # 'target4_name': 'tank',
-            # 'target5_name': 'french_bulldog',
-            'target1_label': 'n02108915',
-            'target2_label': 'n04389033',
-            'target3_label': 'n01532829',
-            'target4_label': 'n01910747',
-            'target5_label': 'n02113712',
+            'target1_name': 'pied_kingfisher',
+            'target2_name': 'savannah_sparrow',
+            'target3_name': 'tropical_kingbird',
+            'target4_name': 'white_breasted_nuthatch',
+            'target5_name': 'pine_grosbeak',
+            'target1_label': '081.Pied_Kingfisher',
+            'target2_label': '127.Savannah_Sparrow',
+            'target3_label': '077.Tropical_Kingbird',
+            'target4_label': '094.White_breasted_Nuthatch',
+            'target5_label': '056.Pine_Grosbeak',
         }
     }
     if dataset_str in dataset_map:
