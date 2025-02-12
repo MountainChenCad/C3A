@@ -88,10 +88,31 @@ def resize_the_batch(data):
     return np.array(resized_data)
 
 
+def print_ndarray_info(ndarray):
+    print(f"Data type: {ndarray.dtype}")
+    print(f"Shape: {ndarray.shape}")
+    print(f"Number of dimensions: {ndarray.ndim}")
+    print(f"Total number of elements: {ndarray.size}")
+    print(f"Bytes per element: {ndarray.itemsize}")
+
+
+def print_dict_info(dictionary):
+    # Print keys
+    print("Keys:", dictionary.keys())
+    # Print values
+    print("Values:", dictionary.values())
+    # Print key-value pairs
+    print("Key-Value Pairs:", dictionary.items())
+    # Print dictionary length (number of key-value pairs)
+    print("Length:", len(dictionary))
+    # Print the full dictionary
+    print("Full Dictionary:", dictionary)
+
+
 if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
-    shot = 1
+    shot = 5
 
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
@@ -175,7 +196,17 @@ if __name__ == '__main__':
             pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}']),
         axis=0)
     support_dict = np.load(support_filename, allow_pickle=True).item()
+    print_dict_info(support_dict)
+    '''
+    This dictionary contains two keys: data and labels. The data key holds a4-dimensional NumPy 
+    array of shape (38400, 84, 84, 3), representing 38,400 RGB images with a resolution of 84x84 
+    pixels each, stored as uint8 values. The labels key contains a 1-dimensional NumPy array of 
+    shape (38400, ), where all entries are the string 'n01532829', 'n01532829', 'n01532829', ...,
+    'n13133613', indicating that all images belong to the several different categories.
+    '''
     support_data, support_labels = support_dict['data'], support_dict['labels']
+    print_ndarray_info(support_data)
+    print_ndarray_info(support_labels)
     support_data_target1, support_data_target2 = (resize_the_batch(
         preprocess_input(support_data[support_labels == target1_label][:shot])),
                                                   resize_the_batch(
@@ -332,8 +363,9 @@ if __name__ == '__main__':
     )
     shap_target1_attributions = explainer.explain(query, class_index=0)
     plt = xai_plot(shap_target1_attributions, query[0])
-    plt.savefig(f"./results/{dataset_str}_feature_attribution_map/shap_{target1_name}_Features_{input_model_str}_{shot}shot.png",
-                dpi=450)
+    plt.savefig(
+        f"./results/{dataset_str}_feature_attribution_map/shap_{target1_name}_Features_{input_model_str}_{shot}shot.png",
+        dpi=450)
     shap_target2_attributions = explainer.explain(query, class_index=1)
     plt = xai_plot(shap_target2_attributions, query[0])
     plt.savefig(
