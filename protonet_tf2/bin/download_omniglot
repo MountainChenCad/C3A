@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+. bin/scripts/flags/declares.sh
+
+variables["-d"]="DATADIR"
+
+. bin/scripts/flags/arguments.sh
+
+DATADIR=${DATADIR:-"data/omniglot/data"}
+
+echo "Data dir: $DATADIR"
+
+mkdir -p $DATADIR
+wget -O /tmp/images_background.zip https://github.com/brendenlake/omniglot/blob/master/python/images_background.zip?raw=true
+wget -O /tmp/images_evaluation.zip https://github.com/brendenlake/omniglot/blob/master/python/images_evaluation.zip?raw=true
+unzip /tmp/images_background.zip -d $DATADIR
+unzip /tmp/images_evaluation.zip -d $DATADIR
+mv $DATADIR/images_background/* $DATADIR
+mv $DATADIR/images_evaluation/* $DATADIR
+rmdir $DATADIR/images_background
+rmdir $DATADIR/images_evaluation
