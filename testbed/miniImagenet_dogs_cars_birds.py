@@ -108,7 +108,6 @@ def print_dict_info(dictionary):
     # Print the full dictionary
     print("Full Dictionary:", dictionary)
 
-
 if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
@@ -261,7 +260,9 @@ if __name__ == '__main__':
         [np.expand_dims(support_data_target1, axis=0), np.expand_dims(support_data_target2, axis=0),
          np.expand_dims(support_data_target3, axis=0), np.expand_dims(support_data_target4, axis=0),
          np.expand_dims(support_data_target5, axis=0)], axis=0)
-
+    exclude_support_data = np.concatenate(
+        [support_data_target3, support_data_target4,
+         support_data_target5], axis=0)
     ### C3A XAI
     ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
     print(f'Average background pixel: {ref_pixel}')
@@ -269,10 +270,12 @@ if __name__ == '__main__':
     c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
         support_data_1=support_data_target1,
         support_data_2=support_data_target2,
+        support_data_3=exclude_support_data,
         query=query, ref_pixel=ref_pixel),
                                               c3a_xai.image_feature_attribution_c3a(
                                                   support_data_1=support_data_target2,
                                                   support_data_2=support_data_target1,
+                                                  support_data_3=exclude_support_data,
                                                   query=query, ref_pixel=ref_pixel))
     ### Ploting functions.
     plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])

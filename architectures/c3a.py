@@ -142,7 +142,9 @@ class C3Amodel:
 
         return score_matrix
 
-    def image_feature_attribution_c3a(self, support_data_1, support_data_2, query, ref_pixel, pad=2, alpha=0.5, progress_bar=True):
+    def image_feature_attribution_c3a(self, support_data_1, support_data_2,
+                                      support_data_3,
+                                      query, ref_pixel, pad=2, alpha=0.5, progress_bar=True):
         rows = np.shape(query)[1]
         cols = np.shape(query)[2]
         chnls = np.shape(query)[3]
@@ -151,15 +153,18 @@ class C3Amodel:
         query_expand = np.expand_dims(np.copy(query), axis=0)  # Batch size of 1
         support_data_1_expand = np.expand_dims(np.copy(support_data_1), axis=0)  # Only 1 support set
         support_data_2_expand = np.expand_dims(np.copy(support_data_2), axis=0)  # Only 1 support set
-        # support_data_3_expand = np.expand_dims(np.copy(support_data_3), axis=0)
+        if np.ndim(support_data_3) == 5:
+            support_data_3_expand = support_data_3
+        else:
+            support_data_3_expand = np.expand_dims(np.copy(support_data_3), axis=0)  # Only 1 support set
 
         features_1 = self.model([support_data_1_expand, query_expand])
         features_2 = self.model([support_data_2_expand, query_expand])
-        # features_3 = self.model([support_data_3_expand, query_expand])
+        features_3 = self.model([support_data_3_expand, query_expand])
 
-        # ref_score = (self.compute_score_from_features_localshot(features_1, class_indx)
-        #              - self.compute_score_from_features_localshot(features_2, class_indx)
-        #              - 0.1*self.compute_score_from_features_localshot(features_3, class_indx))
+        # ref_score = (self.compute_score_from_features_localshot(features_1)
+        #              - self.compute_score_from_features_localshot(features_2)
+        #              - 0.1*self.compute_score_from_features_localshot(features_3))
         ref_score = ((1 - alpha) * self.compute_score_from_features_localshot(features_1)
                      - alpha * self.compute_score_from_features_localshot(features_2))
         print(ref_score)
@@ -179,13 +184,13 @@ class C3Amodel:
             peturbed_images_expand = np.expand_dims(np.copy(peturbed_images), axis=0)
             features_1 = self.model([support_data_1_expand, peturbed_images_expand])
             features_2 = self.model([support_data_2_expand, peturbed_images_expand])
-            # features_3 = self.model([support_data_3_expand, peturbed_images_expand])
+            features_3 = self.model([support_data_3_expand, peturbed_images_expand])
 
             scores = ((1 - alpha) * self.compute_score_from_features_localshot(features_1)
                       - alpha * self.compute_score_from_features_localshot(features_2))
-            # scores = (self.compute_score_from_features_localshot(features_1, class_indx)
-            #           - self.compute_score_from_features_localshot(features_2, class_indx)
-            #           - 0.1*self.compute_score_from_features_localshot(features_3, class_indx))
+            # scores = (self.compute_score_from_features_localshot(features_1)
+            #           - self.compute_score_from_features_localshot(features_2)
+            #           - 0.1*self.compute_score_from_features_localshot(features_3))
             score_matrix[ii, :] = ref_score - scores
 
         return score_matrix

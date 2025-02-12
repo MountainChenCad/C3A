@@ -127,6 +127,7 @@ class Embed:
         # features_plus = self.model([support_data_expand, query_plus_expand])
         # features_minus = self.model([support_data_expand, query_minus_expand])
         ref_score = self.compute_similarity_score(support_data_expand, query_expand, idx)
+        print(f'target {idx} predict prob: {ref_score}')
         plus_score = ref_score - self.compute_similarity_score(support_data_expand, query_plus_expand, idx)
         minus_score = ref_score - self.compute_similarity_score(support_data_expand, query_minus_expand, idx)
 
