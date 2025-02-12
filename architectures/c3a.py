@@ -1,11 +1,9 @@
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Lambda, TimeDistributed
 from tqdm import tqdm
-
-from utils.tensor_operations import *
 from utils.distance_functions import *
 
-class ProtoShotXAI:
+class C3Amodel:
     def __init__(self, model, input_layer=0, feature_layer=-4, class_layer=-1):
 
         input_shape = model.input.shape
@@ -25,7 +23,7 @@ class ProtoShotXAI:
         self.model = Model([support, query], features)
 
 
-    def compute_score_from_features(self,features):
+    def compute_score_from_features(self,features,iclass):
         ## This methods is ProtoShotXAI, which squeezes spatial dimensions
         s_feature_t, q_feature_t = features
         s_feature_t = s_feature_t.numpy()  # 形状: (1, 100, 7, 7, 2048)
@@ -46,7 +44,7 @@ class ProtoShotXAI:
         score = np.squeeze(similarity)  # 形状: (1,)
         return score
 
-    def compute_score_from_features_localshot(self, features, iclass, k=10):
+    def compute_score_from_features_localshot(self, features, k=10):
         ## This method implements DN4, which uses nearest neighbor similarity
         s_feature_t, q_feature_t = features
         s_feature_t = s_feature_t.numpy()  # 形状: (1, batchsize_s, 7, 7, 2048)
@@ -76,7 +74,7 @@ class ProtoShotXAI:
 
         return score
 
-    def image_feature_attribution(self,support_data,query, ref_pixel, pad=4 , progress_bar=True):
+    def image_feature_attribution(self,support_data,query, class_indx, ref_pixel, pad=2 , progress_bar=True):
         rows = np.shape(query)[1]
         cols = np.shape(query)[2]
         chnls = np.shape(query)[3]
@@ -87,8 +85,8 @@ class ProtoShotXAI:
 
         features = self.model([support_data_expand,query_expand])
         # ref_score = self.compute_score_from_features_dn4(features,class_indx)
-        ref_score = self.compute_score_from_features(features)
-        print(ref_score)
+        ref_score = self.compute_score_from_features(features, class_indx)
+        print(ref_score, class_indx)
         # Create peturbed_images
         score_matrix = np.zeros((rows,cols))
         peturbed_images = np.zeros((cols,rows,cols,chnls))
@@ -105,7 +103,7 @@ class ProtoShotXAI:
             peturbed_images_expand = np.expand_dims(np.copy(peturbed_images),axis=0)
             features = self.model([support_data_expand,peturbed_images_expand])
 
-            scores = self.compute_score_from_features(features)
+            scores = self.compute_score_from_features(features, class_indx)
             score_matrix[ii,:] = ref_score - scores
         
         return score_matrix
@@ -144,9 +142,7 @@ class ProtoShotXAI:
 
         return score_matrix
 
-    def image_feature_attribution_contra(self, support_data_1, support_data_2,
-                                         # support_data_3,
-                                         query, class_indx, ref_pixel, pad=2, alpha=0.5, progress_bar=True):
+    def image_feature_attribution_c3a(self, support_data_1, support_data_2, query, ref_pixel, pad=4, alpha=0.5, progress_bar=True):
         rows = np.shape(query)[1]
         cols = np.shape(query)[2]
         chnls = np.shape(query)[3]
@@ -164,9 +160,9 @@ class ProtoShotXAI:
         # ref_score = (self.compute_score_from_features_localshot(features_1, class_indx)
         #              - self.compute_score_from_features_localshot(features_2, class_indx)
         #              - 0.1*self.compute_score_from_features_localshot(features_3, class_indx))
-        ref_score = ((1 - alpha) * self.compute_score_from_features_localshot(features_1, class_indx)
-                     - alpha * self.compute_score_from_features_localshot(features_2, class_indx))
-        print(ref_score, class_indx)
+        ref_score = ((1 - alpha) * self.compute_score_from_features_localshot(features_1)
+                     - alpha * self.compute_score_from_features_localshot(features_2))
+        print(ref_score)
         # Create peturbed_images
         score_matrix = np.zeros((rows, cols))
         peturbed_images = np.zeros((cols, rows, cols, chnls))
@@ -185,8 +181,8 @@ class ProtoShotXAI:
             features_2 = self.model([support_data_2_expand, peturbed_images_expand])
             # features_3 = self.model([support_data_3_expand, peturbed_images_expand])
 
-            scores = ((1 - alpha) * self.compute_score_from_features_localshot(features_1, class_indx)
-                      - alpha * self.compute_score_from_features_localshot(features_2, class_indx))
+            scores = ((1 - alpha) * self.compute_score_from_features_localshot(features_1)
+                      - alpha * self.compute_score_from_features_localshot(features_2))
             # scores = (self.compute_score_from_features_localshot(features_1, class_indx)
             #           - self.compute_score_from_features_localshot(features_2, class_indx)
             #           - 0.1*self.compute_score_from_features_localshot(features_3, class_indx))
