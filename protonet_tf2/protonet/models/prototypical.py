@@ -99,7 +99,7 @@ class ResidualBlock(Layer):
         return config
 
 class Prototypical(Model):
-    def __init__(self, n_support, n_query, w, h, c, encoder_type='resnet12', nb_layers=4, nb_filters=64, base_model=None):
+    def __init__(self, w, h, c, encoder_type='resnet12', nb_layers=4, base_model=None):
         super(Prototypical, self).__init__()
         self.w, self.h, self.c = w, h, c
 
@@ -108,6 +108,7 @@ class Prototypical(Model):
             layers.append(base_model)
 
         if encoder_type == 'conv64F':
+            nb_filters = 64
             for i in range(nb_layers):
                 layers += self.conv_block(nb_filters=nb_filters)
             layers.append(Flatten())
@@ -143,6 +144,7 @@ class Prototypical(Model):
 
         cat = tf.concat([
             tf.reshape(support, [n_class * n_support, self.w, self.h, self.c]),
+            # tf.reshape(query, [1 * n_query, self.w, self.h, self.c])], axis=0)
             tf.reshape(query, [n_class * n_query, self.w, self.h, self.c])], axis=0)
         z = self.encoder(cat)
 
