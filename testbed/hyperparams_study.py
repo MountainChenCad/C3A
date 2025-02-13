@@ -31,7 +31,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 
 if __name__ == '__main__':
 
-    ## To carry our ablation study, specify 'shot' or 'padding_size'
+    ## To carry our ablation study, specify 'shot' or 'padding_size' or 'k'
     hyperparams_type = 'shot'
     dataset_str = 'dogs'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
@@ -139,13 +139,13 @@ if __name__ == '__main__':
 
     ### Immediately we load the query and support data here.
     query_dict = pickle.load(open(query_filename, 'rb'))
-    print_dict_info(query_dict)
+    # print_dict_info(query_dict)
     query_pickle = np.expand_dims(
         preprocess_input(
             pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}']),
         axis=0)
     support_dict = np.load(support_filename, allow_pickle=True).item()
-    print_dict_info(support_dict)
+    # print_dict_info(support_dict)
     '''
     This dictionary contains two keys: data and labels. The data key holds a4-dimensional NumPy 
     array of shape (38400, 84, 84, 3), representing 38,400 RGB images with a resolution of 84x84 
@@ -157,7 +157,8 @@ if __name__ == '__main__':
     if hyperparams_type == 'shot':
         for shot in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
             padding_size = 6
-            print(f'Hyperparams study: {hyperparams_type}| shot->{shot}, padding_size->{padding_size} start.')
+            k = 10
+            print(f'Hyperparams study: {hyperparams_type}| shot->{shot}, padding_size->{padding_size}, k->{k} start.')
             save_dir = f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}"
             os.makedirs(save_dir, exist_ok=True)
             support_data_target1, support_data_target2 = (resize_the_batch(
@@ -189,9 +190,8 @@ if __name__ == '__main__':
                 [support_data_target3, support_data_target4,
                  support_data_target5], axis=0)
             ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
-
+            # print(f'Average background pixel: {ref_pixel}')
             ### C3A XAI
-            print(f'Average background pixel: {ref_pixel}')
             c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
             c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
                 support_data_1=support_data_target1,
@@ -206,11 +206,11 @@ if __name__ == '__main__':
             ### Ploting functions.
             plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
             plt.savefig(
-                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
+                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size_{k}k.png",
                 dpi=450)
             plt = xai_plot(c3a_target2_scores, resize_the_batch(query_pickle)[0])
             plt.savefig(
-                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
+                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size_{k}k.png",
                 dpi=450)
             # ## Fidelity calculation.
             # c3a_target1_plus_image, c3a_target1_minus_image = generate_masked_images(
@@ -232,7 +232,8 @@ if __name__ == '__main__':
     elif hyperparams_type == 'padding_size':
         for padding_size in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
             shot = 1
-            print(f'Hyperparams study: {hyperparams_type}| shot->{shot}, padding_size->{padding_size} start.')
+            k = 10
+            print(f'Hyperparams study: {hyperparams_type}| shot->{shot}, padding_size->{padding_size}, k->{k} start.')
             save_dir = f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}"
             os.makedirs(save_dir, exist_ok=True)
             support_data_target1, support_data_target2 = (resize_the_batch(
@@ -266,9 +267,8 @@ if __name__ == '__main__':
                 [support_data_target3, support_data_target4,
                  support_data_target5], axis=0)
             ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
-
+            # print(f'Average background pixel: {ref_pixel}')
             ### C3A XAI
-            print(f'Average background pixel: {ref_pixel}')
             c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
             c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
                 support_data_1=support_data_target1,
@@ -283,9 +283,69 @@ if __name__ == '__main__':
             ### Ploting functions.
             plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
             plt.savefig(
-                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
+                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size_{k}k.png",
                 dpi=450)
             plt = xai_plot(c3a_target2_scores, resize_the_batch(query_pickle)[0])
             plt.savefig(
-                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
+                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size_{k}k.png",
+                dpi=450)
+    elif hyperparams_type == 'k':
+        for k in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]:
+            shot = 1
+            padding_size = 6
+            print(f'Hyperparams study: {hyperparams_type}| shot->{shot}, padding_size->{padding_size}, k->{k} start.')
+            save_dir = f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}"
+            os.makedirs(save_dir, exist_ok=True)
+            support_data_target1, support_data_target2 = (resize_the_batch(
+                preprocess_input(support_data[support_labels == target1_label][:shot])),
+                                                          resize_the_batch(
+                                                              preprocess_input(
+                                                                  support_data[support_labels == target2_label][
+                                                                  :shot])))
+
+            ### Load the associated model weights.
+            base_model = Prototypical(w=84, h=84, c=3, nb_layers=4, encoder_type=encoder_type)
+            base_model.encoder(tf.keras.Input((84, 84, 3)))
+            base_model.encoder.load_weights(model_filename)
+            # base_model.encoder.summary()
+            rgb_query = resize_the_batch(  # For fidelity calculation.
+                np.expand_dims(
+                    pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}'],
+                    axis=0)).squeeze() / 255
+            embed = Embed(base_model.encoder, feature_layer=flatten_layer)  # For fidelity calculation.
+            query = resize_the_batch(query_pickle)
+            ### Create episode data.
+            support_data_target3, support_data_target4, support_data_target5 = (
+                resize_the_batch(preprocess_input(support_data[support_labels == target3_label][:shot])),
+                resize_the_batch(preprocess_input(support_data[support_labels == target4_label][:shot])),
+                resize_the_batch(preprocess_input(support_data[support_labels == target5_label][:shot])))
+            episode_support_data = np.concatenate(
+                [np.expand_dims(support_data_target1, axis=0), np.expand_dims(support_data_target2, axis=0),
+                 np.expand_dims(support_data_target3, axis=0), np.expand_dims(support_data_target4, axis=0),
+                 np.expand_dims(support_data_target5, axis=0)], axis=0)
+            exclude_support_data = np.concatenate(
+                [support_data_target3, support_data_target4,
+                 support_data_target5], axis=0)
+            ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
+            # print(f'Average background pixel: {ref_pixel}')
+            ### C3A XAI
+            c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
+            c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
+                support_data_1=support_data_target1,
+                support_data_2=support_data_target2,
+                support_data_3=exclude_support_data,
+                query=query, ref_pixel=ref_pixel, pad=padding_size),
+                                                      c3a_xai.image_feature_attribution_c3a(
+                                                          support_data_1=support_data_target2,
+                                                          support_data_2=support_data_target1,
+                                                          support_data_3=exclude_support_data,
+                                                          query=query, ref_pixel=ref_pixel, pad=padding_size))
+            ### Ploting functions.
+            plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
+            plt.savefig(
+                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size_{k}k.png",
+                dpi=450)
+            plt = xai_plot(c3a_target2_scores, resize_the_batch(query_pickle)[0])
+            plt.savefig(
+                f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}/c3a_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size_{k}k.png",
                 dpi=450)

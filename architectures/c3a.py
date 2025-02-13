@@ -4,8 +4,8 @@ from tqdm import tqdm
 from utils.distance_functions import *
 
 class C3Amodel:
-    def __init__(self, model, input_layer=0, feature_layer=-4, class_layer=-1):
-
+    def __init__(self, model, k=10, feature_layer=-4, class_layer=-1):
+        self.k = k
         input_shape = model.input.shape
 
         output_vals = model.layers[feature_layer].output
@@ -44,7 +44,8 @@ class C3Amodel:
         score = np.squeeze(similarity)  # 形状: (1,)
         return score
 
-    def compute_score_from_features_localshot(self, features, k=10):
+    def compute_score_from_features_localshot(self, features):
+        k = self.k
         ## This method implements DN4, which uses nearest neighbor similarity
         s_feature_t, q_feature_t = features
         s_feature_t = s_feature_t.numpy()  # 形状: (1, batchsize_s, 7, 7, 2048)
@@ -108,7 +109,7 @@ class C3Amodel:
         
         return score_matrix
 
-    def image_feature_attribution_localshot(self, support_data, query, class_indx, ref_pixel, pad=2, progress_bar=True):
+    def image_feature_attribution_localshot(self, support_data, query, ref_pixel, pad=2, progress_bar=True):
         rows = np.shape(query)[1]
         cols = np.shape(query)[2]
         chnls = np.shape(query)[3]
@@ -118,9 +119,8 @@ class C3Amodel:
         support_data_expand = np.expand_dims(np.copy(support_data), axis=0)  # Only 1 support set
 
         features = self.model([support_data_expand, query_expand])
-        # ref_score = self.compute_score_from_features_dn4(features,class_indx)
-        ref_score = self.compute_score_from_features_localshot(features, class_indx)
-        print(ref_score, class_indx)
+        ref_score = self.compute_score_from_features_localshot(features)
+        print(ref_score)
         # Create peturbed_images
         score_matrix = np.zeros((rows, cols))
         peturbed_images = np.zeros((cols, rows, cols, chnls))
@@ -137,7 +137,7 @@ class C3Amodel:
             peturbed_images_expand = np.expand_dims(np.copy(peturbed_images), axis=0)
             features = self.model([support_data_expand, peturbed_images_expand])
 
-            scores = self.compute_score_from_features_localshot(features, class_indx)
+            scores = self.compute_score_from_features_localshot(features)
             score_matrix[ii, :] = ref_score - scores
 
         return score_matrix

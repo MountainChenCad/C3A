@@ -222,13 +222,13 @@ if __name__ == '__main__':
 
     ### Immediately we load the query and support data here.
     query_dict = pickle.load(open(query_filename, 'rb'))
-    print_dict_info(query_dict)
+    # print_dict_info(query_dict)
     query_pickle = np.expand_dims(
         preprocess_input(
             pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}']),
         axis=0)
     support_dict = np.load(support_filename, allow_pickle=True).item()
-    print_dict_info(support_dict)
+    # print_dict_info(support_dict)
     '''
     This dictionary contains two keys: data and labels. The data key holds a4-dimensional NumPy 
     array of shape (38400, 84, 84, 3), representing 38,400 RGB images with a resolution of 84x84 
@@ -265,9 +265,9 @@ if __name__ == '__main__':
     exclude_support_data = np.concatenate(
         [support_data_target3, support_data_target4,
          support_data_target5], axis=0)
-    ### C3A XAI
     ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
-    print(f'Average background pixel: {ref_pixel}')
+    # print(f'Average background pixel: {ref_pixel}')
+    ### C3A XAI
     c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
     c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
         support_data_1=support_data_target1,
@@ -282,11 +282,11 @@ if __name__ == '__main__':
     ### Ploting functions.
     plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/c3a_{target1_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_feature_attribution_map/c3a_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
         dpi=450)
     plt = xai_plot(c3a_target2_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/c3a_{target2_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_feature_attribution_map/c3a_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
         dpi=450)
     ## Fidelity calculation.
     c3a_target1_plus_image, c3a_target1_minus_image = generate_masked_images(
@@ -320,12 +320,12 @@ if __name__ == '__main__':
     ### Ploting functions.
     plt = xai_plot(protoshot_target1_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/protoshot_{target1_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_feature_attribution_map/protoshot_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
         dpi=450)
 
     plt = xai_plot(protoshot_target2_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/protoshot_{target2_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_feature_attribution_map/protoshot_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
         dpi=450)
     ## Fidelity calculation.
     protoshot_target1_plus_image, protoshot_target1_minus_image = generate_masked_images(
