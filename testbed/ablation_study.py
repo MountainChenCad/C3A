@@ -32,7 +32,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
-    shot = 5
+    shot = 1
     dataset_str = 'dogs'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'

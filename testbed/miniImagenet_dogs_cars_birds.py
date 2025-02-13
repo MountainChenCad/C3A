@@ -108,11 +108,13 @@ def print_dict_info(dictionary):
     # Print the full dictionary
     print("Full Dictionary:", dictionary)
 
+
 if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
     shot = 5
     dataset_str = 'dogs'
+    padding_size = 6
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
     # input_model_str = 'ResNet12'
@@ -271,12 +273,12 @@ if __name__ == '__main__':
         support_data_1=support_data_target1,
         support_data_2=support_data_target2,
         support_data_3=exclude_support_data,
-        query=query, ref_pixel=ref_pixel),
+        query=query, ref_pixel=ref_pixel, pad=padding_size),
                                               c3a_xai.image_feature_attribution_c3a(
                                                   support_data_1=support_data_target2,
                                                   support_data_2=support_data_target1,
                                                   support_data_3=exclude_support_data,
-                                                  query=query, ref_pixel=ref_pixel))
+                                                  query=query, ref_pixel=ref_pixel, pad=padding_size))
     ### Ploting functions.
     plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
@@ -307,10 +309,14 @@ if __name__ == '__main__':
     ### ProtoShotXAI
     protoshot_xai = ProtoShotXAI(base_model.encoder, feature_layer=flatten_layer)
     protoshot_target1_scores, protoshot_target2_scores = (protoshot_xai.image_feature_attribution(
-        support_data=support_data_target1, query=query, ref_pixel=ref_pixel),
+        support_data=support_data_target1, query=query, ref_pixel=ref_pixel,
+        pad=padding_size
+    ),
                                                           protoshot_xai.image_feature_attribution(
                                                               support_data=support_data_target2, query=query,
-                                                              ref_pixel=ref_pixel))
+                                                              ref_pixel=ref_pixel,
+                                                              pad=padding_size
+                                                          ))
     ### Ploting functions.
     plt = xai_plot(protoshot_target1_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
