@@ -144,7 +144,7 @@ class C3Amodel:
 
     def image_feature_attribution_c3a(self, support_data_1, support_data_2,
                                       support_data_3,
-                                      query, ref_pixel, pad=2, alpha=0.5, progress_bar=True):
+                                      query, ref_pixel, pad=8, alpha=0.5, progress_bar=True):
         rows = np.shape(query)[1]
         cols = np.shape(query)[2]
         chnls = np.shape(query)[3]

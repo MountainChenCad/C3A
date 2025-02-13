@@ -146,7 +146,7 @@ class ProtoShotXAI:
 
     def image_feature_attribution_contra(self, support_data_1, support_data_2,
                                          # support_data_3,
-                                         query, class_indx, ref_pixel, pad=4, alpha=0.5, progress_bar=True):
+                                         query, class_indx, ref_pixel, pad=10, alpha=0.5, progress_bar=True):
         rows = np.shape(query)[1]
         cols = np.shape(query)[2]
         chnls = np.shape(query)[3]
