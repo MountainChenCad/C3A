@@ -33,6 +33,7 @@ if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
     shot = 1
+    k = 10
     padding_size = 6
     dataset_str = 'dogs'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
@@ -188,7 +189,7 @@ if __name__ == '__main__':
     ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
     # print(f'Average background pixel: {ref_pixel}')
     ### C3A XAI
-    c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
+    c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
     c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
         support_data_1=support_data_target1,
         support_data_2=support_data_target2,
@@ -213,7 +214,7 @@ if __name__ == '__main__':
         f"./results/{dataset_str}_feature_attribution_map/c3a_{target2_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
     ### C3A|contra-local+ XAI
-    c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
+    c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
     c3a01_target1_scores, c3a01_target2_scores = (c3a_xai.image_feature_attribution_localshot(
         support_data=support_data_target1,
         query=query, ref_pixel=ref_pixel,
@@ -234,7 +235,7 @@ if __name__ == '__main__':
         f"./results/{dataset_str}_feature_attribution_map/c3a_contra-local+_{target2_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
     ### C3A|contra+local- XAI
-    c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
+    c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
     c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_localshot(
         support_data=support_data_target1,
         query=query, ref_pixel=ref_pixel,

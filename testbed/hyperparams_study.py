@@ -329,7 +329,7 @@ if __name__ == '__main__':
             ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
             # print(f'Average background pixel: {ref_pixel}')
             ### C3A XAI
-            c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
+            c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
             c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
                 support_data_1=support_data_target1,
                 support_data_2=support_data_target2,
