@@ -157,6 +157,7 @@ if __name__ == '__main__':
     if hyperparams_type == 'shot':
         for shot in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
             padding_size = 6
+            print(f'Hyperparams study: {hyperparams_type}| shot->{shot}, padding_size->{padding_size} start.')
             save_dir = f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}"
             os.makedirs(save_dir, exist_ok=True)
             support_data_target1, support_data_target2 = (resize_the_batch(
@@ -169,7 +170,7 @@ if __name__ == '__main__':
             base_model = Prototypical(w=84, h=84, c=3, nb_layers=4, encoder_type=encoder_type)
             base_model.encoder(tf.keras.Input((84, 84, 3)))
             base_model.encoder.load_weights(model_filename)
-            base_model.encoder.summary()
+            # base_model.encoder.summary()
             rgb_query = resize_the_batch(  # For fidelity calculation.
                 np.expand_dims(
                     pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}'], axis=0)).squeeze() / 255
@@ -196,12 +197,12 @@ if __name__ == '__main__':
                 support_data_1=support_data_target1,
                 support_data_2=support_data_target2,
                 support_data_3=exclude_support_data,
-                query=query, ref_pixel=ref_pixel),
+                query=query, ref_pixel=ref_pixel, pad = padding_size),
                                                       c3a_xai.image_feature_attribution_c3a(
                                                           support_data_1=support_data_target2,
                                                           support_data_2=support_data_target1,
                                                           support_data_3=exclude_support_data,
-                                                          query=query, ref_pixel=ref_pixel))
+                                                          query=query, ref_pixel=ref_pixel, pad = padding_size))
             ### Ploting functions.
             plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
             plt.savefig(
@@ -231,6 +232,7 @@ if __name__ == '__main__':
     elif hyperparams_type == 'padding_size':
         for padding_size in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
             shot = 1
+            print(f'Hyperparams study: {hyperparams_type}| shot->{shot}, padding_size->{padding_size} start.')
             save_dir = f"./results/{dataset_str}_hyperparams_study/{hyperparams_type}"
             os.makedirs(save_dir, exist_ok=True)
             support_data_target1, support_data_target2 = (resize_the_batch(
@@ -244,7 +246,7 @@ if __name__ == '__main__':
             base_model = Prototypical(w=84, h=84, c=3, nb_layers=4, encoder_type=encoder_type)
             base_model.encoder(tf.keras.Input((84, 84, 3)))
             base_model.encoder.load_weights(model_filename)
-            base_model.encoder.summary()
+            # base_model.encoder.summary()
             rgb_query = resize_the_batch(  # For fidelity calculation.
                 np.expand_dims(
                     pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}'],
@@ -272,12 +274,12 @@ if __name__ == '__main__':
                 support_data_1=support_data_target1,
                 support_data_2=support_data_target2,
                 support_data_3=exclude_support_data,
-                query=query, ref_pixel=ref_pixel),
+                query=query, ref_pixel=ref_pixel, pad = padding_size),
                                                       c3a_xai.image_feature_attribution_c3a(
                                                           support_data_1=support_data_target2,
                                                           support_data_2=support_data_target1,
                                                           support_data_3=exclude_support_data,
-                                                          query=query, ref_pixel=ref_pixel))
+                                                          query=query, ref_pixel=ref_pixel, pad = padding_size))
             ### Ploting functions.
             plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
             plt.savefig(
