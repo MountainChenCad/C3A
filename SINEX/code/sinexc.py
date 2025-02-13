@@ -19,7 +19,7 @@ class Sinexc:
 
         for sidx in range(len(S)):
             # Gents inputs
-            si = S[sidx]
+            si = S[sidx].squeeze(0)
             
             # Stores initial similarity
             v = self.Helpers.predict_similarity(f, x, si) # calculate initial similarity
