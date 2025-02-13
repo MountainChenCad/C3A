@@ -111,7 +111,7 @@ def print_dict_info(dictionary):
 if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
-    shot = 1
+    shot = 5
     dataset_str = 'dogs'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
