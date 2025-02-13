@@ -67,7 +67,7 @@ if __name__ == '__main__':
         raise ValueError(f"Model {input_model_str} is not recognized.")
 
     ### Note that miniImagenet, dogs, cars, and birds are applicable to this testbed.
-    save_dir = f"./results/{dataset_str}_feature_attribution_map"
+    save_dir = f"./results/{dataset_str}_ablation"
     os.makedirs(save_dir, exist_ok=True)
     dataset_map = {
         'miniImagenet': {
@@ -207,11 +207,11 @@ if __name__ == '__main__':
     ### Ploting functions.
     plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/c3a_{target1_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_ablation/c3a_{target1_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
     plt = xai_plot(c3a_target2_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/c3a_{target2_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_ablation/c3a_{target2_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
     ### C3A|contra-local+ XAI
     c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
@@ -228,32 +228,32 @@ if __name__ == '__main__':
     ### Ploting functions.
     plt = xai_plot(c3a01_target1_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/c3a_contra-local+_{target1_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_ablation/c3a_contra-local+_{target1_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
     plt = xai_plot(c3a01_target2_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/c3a_contra-local+_{target2_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_ablation/c3a_contra-local+_{target2_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
     ### C3A|contra+local- XAI
     c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
-    c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_localshot(
+    c3a10_target1_scores, c3a10_target2_scores = (c3a_xai.image_feature_attribution_contraprotoshot(
         support_data=support_data_target1,
         query=query, ref_pixel=ref_pixel,
         pad=padding_size
     ),
-                                              c3a_xai.image_feature_attribution_localshot(
+                                              c3a_xai.image_feature_attribution_contraprotoshot(
                                                   support_data=support_data_target2,
                                                   query=query, ref_pixel=ref_pixel,
                                                   pad=padding_size
                                               ))
     ### Ploting functions.
-    plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
+    plt = xai_plot(c3a10_target1_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/c3a_contra-local+_{target1_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_ablation/c3a_contra+local-_{target1_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
-    plt = xai_plot(c3a_target2_scores, resize_the_batch(query_pickle)[0])
+    plt = xai_plot(c3a10_target2_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/c3a_contra-local+_{target2_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_ablation/c3a_contra+local-_{target2_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
     # ## Fidelity calculation.
     # c3a_target1_plus_image, c3a_target1_minus_image = generate_masked_images(
@@ -287,12 +287,12 @@ if __name__ == '__main__':
     ### Ploting functions.
     plt = xai_plot(protoshot_target1_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/protoshot_{target1_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_ablation/protoshot_{target1_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
 
     plt = xai_plot(protoshot_target2_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
-        f"./results/{dataset_str}_feature_attribution_map/protoshot_{target2_name}_Features_{input_model_str}_{shot}shot.png",
+        f"./results/{dataset_str}_ablation/protoshot_{target2_name}_Features_{input_model_str}_{shot}shot.png",
         dpi=450)
     # ## Fidelity calculation.
     # protoshot_target1_plus_image, protoshot_target1_minus_image = generate_masked_images(
