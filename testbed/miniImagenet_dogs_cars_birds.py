@@ -112,7 +112,7 @@ if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
     shot = 1
-    dataset_str = 'birds'
+    dataset_str = 'dogs'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
     # input_model_str = 'ResNet12'
@@ -162,18 +162,18 @@ if __name__ == '__main__':
             'target5_label': 'n02113712',
         },
         'dogs': {
-            'query_filename': '../data/.pkl',
+            'query_filename': '../data/chow_and_shih_tzu.pkl',
             'support_filename': '../data/dogs_train_data.npy',
-            'target1_name': 'french_bulldog',
-            'target2_name': 'tank',
-            # 'target3_name': 'french_bulldog',
-            # 'target4_name': 'tank',
-            # 'target5_name': 'french_bulldog',
-            'target1_label': 'n02108915',
-            'target2_label': 'n04389033',
-            'target3_label': 'n01532829',
-            'target4_label': 'n01910747',
-            'target5_label': 'n02113712',
+            'target1_name': 'chow',
+            'target2_name': 'shih_tzu',
+            'target3_name': 'boston_bull',
+            'target4_name': 'appenzeller',
+            'target5_name': 'dandie_dinmont',
+            'target1_label': 'n02112137-chow',
+            'target2_label': 'n02086240-Shih-Tzu',
+            'target3_label': 'n02096585-Boston_bull',
+            'target4_label': 'n02107908-Appenzeller',
+            'target5_label': 'n02096437-Dandie_Dinmont',
         },
         'cars': {
             'query_filename': '../data/rolls_and_buick.pkl',
@@ -263,83 +263,83 @@ if __name__ == '__main__':
     exclude_support_data = np.concatenate(
         [support_data_target3, support_data_target4,
          support_data_target5], axis=0)
-    # ### C3A XAI
-    # ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
-    # print(f'Average background pixel: {ref_pixel}')
-    # c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
-    # c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
-    #     support_data_1=support_data_target1,
-    #     support_data_2=support_data_target2,
-    #     support_data_3=exclude_support_data,
-    #     query=query, ref_pixel=ref_pixel),
-    #                                           c3a_xai.image_feature_attribution_c3a(
-    #                                               support_data_1=support_data_target2,
-    #                                               support_data_2=support_data_target1,
-    #                                               support_data_3=exclude_support_data,
-    #                                               query=query, ref_pixel=ref_pixel))
-    # ### Ploting functions.
-    # plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/c3a_{target1_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
-    # plt = xai_plot(c3a_target2_scores, resize_the_batch(query_pickle)[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/c3a_{target2_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
-    # ## Fidelity calculation.
-    # c3a_target1_plus_image, c3a_target1_minus_image = generate_masked_images(
-    #     feature_attributions=c3a_target1_scores, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # c3a_target2_plus_image, c3a_target2_minus_image = generate_masked_images(
-    #     feature_attributions=c3a_target2_scores, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # c3a_target1_fidelity_plus, c3a_target1_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(c3a_target1_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(c3a_target1_minus_image, axis=0)), idx=0)
-    # c3a_target2_fidelity_plus, c3a_target2_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(c3a_target2_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(c3a_target2_minus_image, axis=0)), idx=1)
-    # print(f'C3A_{target1_name} -> Fidelity+:{c3a_target1_fidelity_plus}, Fidelity-:{c3a_target1_fidelity_minus}')
-    # print(f'C3A_{target2_name} -> Fidelity+:{c3a_target2_fidelity_plus}, Fidelity-:{c3a_target2_fidelity_minus}')
-    # #
-    # ### ProtoShotXAI
-    # protoshot_xai = ProtoShotXAI(base_model.encoder, feature_layer=flatten_layer)
-    # protoshot_target1_scores, protoshot_target2_scores = (protoshot_xai.image_feature_attribution(
-    #     support_data=support_data_target1, query=query, ref_pixel=ref_pixel),
-    #                                                       protoshot_xai.image_feature_attribution(
-    #                                                           support_data=support_data_target2, query=query,
-    #                                                           ref_pixel=ref_pixel))
-    # ### Ploting functions.
-    # plt = xai_plot(protoshot_target1_scores, resize_the_batch(query_pickle)[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/protoshot_{target1_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
+    ### C3A XAI
+    ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
+    print(f'Average background pixel: {ref_pixel}')
+    c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer)
+    c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
+        support_data_1=support_data_target1,
+        support_data_2=support_data_target2,
+        support_data_3=exclude_support_data,
+        query=query, ref_pixel=ref_pixel),
+                                              c3a_xai.image_feature_attribution_c3a(
+                                                  support_data_1=support_data_target2,
+                                                  support_data_2=support_data_target1,
+                                                  support_data_3=exclude_support_data,
+                                                  query=query, ref_pixel=ref_pixel))
+    ### Ploting functions.
+    plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
+    plt.savefig(
+        f"./results/{dataset_str}_feature_attribution_map/c3a_{target1_name}_Features_{input_model_str}_{shot}shot.png",
+        dpi=450)
+    plt = xai_plot(c3a_target2_scores, resize_the_batch(query_pickle)[0])
+    plt.savefig(
+        f"./results/{dataset_str}_feature_attribution_map/c3a_{target2_name}_Features_{input_model_str}_{shot}shot.png",
+        dpi=450)
+    ## Fidelity calculation.
+    c3a_target1_plus_image, c3a_target1_minus_image = generate_masked_images(
+        feature_attributions=c3a_target1_scores, original_image=rgb_query,
+        input_percentile=99.9, mask_threshold=0.5)
+    c3a_target2_plus_image, c3a_target2_minus_image = generate_masked_images(
+        feature_attributions=c3a_target2_scores, original_image=rgb_query,
+        input_percentile=99.9, mask_threshold=0.5)
+    c3a_target1_fidelity_plus, c3a_target1_fidelity_minus = embed.fidelity_scores(
+        episode_support_data, query,
+        resize_the_batch(np.expand_dims(c3a_target1_plus_image, axis=0)),
+        resize_the_batch(np.expand_dims(c3a_target1_minus_image, axis=0)), idx=0)
+    c3a_target2_fidelity_plus, c3a_target2_fidelity_minus = embed.fidelity_scores(
+        episode_support_data, query,
+        resize_the_batch(np.expand_dims(c3a_target2_plus_image, axis=0)),
+        resize_the_batch(np.expand_dims(c3a_target2_minus_image, axis=0)), idx=1)
+    print(f'C3A_{target1_name} -> Fidelity+:{c3a_target1_fidelity_plus}, Fidelity-:{c3a_target1_fidelity_minus}')
+    print(f'C3A_{target2_name} -> Fidelity+:{c3a_target2_fidelity_plus}, Fidelity-:{c3a_target2_fidelity_minus}')
     #
-    # plt = xai_plot(protoshot_target2_scores, resize_the_batch(query_pickle)[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/protoshot_{target2_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
-    # ## Fidelity calculation.
-    # protoshot_target1_plus_image, protoshot_target1_minus_image = generate_masked_images(
-    #     feature_attributions=protoshot_target1_scores, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # protoshot_target2_plus_image, protoshot_target2_minus_image = generate_masked_images(
-    #     feature_attributions=protoshot_target2_scores, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # protoshot_target1_fidelity_plus, protoshot_target1_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(protoshot_target1_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(protoshot_target1_minus_image, axis=0)), idx=0)
-    # protoshot_target2_fidelity_plus, protoshot_target2_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(protoshot_target2_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(protoshot_target2_minus_image, axis=0)), idx=1)
-    # print(
-    #     f'ProtoShotXAI_{target1_name} -> Fidelity+:{protoshot_target1_fidelity_plus}, Fidelity-:{protoshot_target1_fidelity_minus}')
-    # print(
-    #     f'ProtoShotXAI_{target2_name} -> Fidelity+:{protoshot_target2_fidelity_plus}, Fidelity-:{protoshot_target2_fidelity_minus}')
+    ### ProtoShotXAI
+    protoshot_xai = ProtoShotXAI(base_model.encoder, feature_layer=flatten_layer)
+    protoshot_target1_scores, protoshot_target2_scores = (protoshot_xai.image_feature_attribution(
+        support_data=support_data_target1, query=query, ref_pixel=ref_pixel),
+                                                          protoshot_xai.image_feature_attribution(
+                                                              support_data=support_data_target2, query=query,
+                                                              ref_pixel=ref_pixel))
+    ### Ploting functions.
+    plt = xai_plot(protoshot_target1_scores, resize_the_batch(query_pickle)[0])
+    plt.savefig(
+        f"./results/{dataset_str}_feature_attribution_map/protoshot_{target1_name}_Features_{input_model_str}_{shot}shot.png",
+        dpi=450)
+
+    plt = xai_plot(protoshot_target2_scores, resize_the_batch(query_pickle)[0])
+    plt.savefig(
+        f"./results/{dataset_str}_feature_attribution_map/protoshot_{target2_name}_Features_{input_model_str}_{shot}shot.png",
+        dpi=450)
+    ## Fidelity calculation.
+    protoshot_target1_plus_image, protoshot_target1_minus_image = generate_masked_images(
+        feature_attributions=protoshot_target1_scores, original_image=rgb_query,
+        input_percentile=99.9, mask_threshold=0.5)
+    protoshot_target2_plus_image, protoshot_target2_minus_image = generate_masked_images(
+        feature_attributions=protoshot_target2_scores, original_image=rgb_query,
+        input_percentile=99.9, mask_threshold=0.5)
+    protoshot_target1_fidelity_plus, protoshot_target1_fidelity_minus = embed.fidelity_scores(
+        episode_support_data, query,
+        resize_the_batch(np.expand_dims(protoshot_target1_plus_image, axis=0)),
+        resize_the_batch(np.expand_dims(protoshot_target1_minus_image, axis=0)), idx=0)
+    protoshot_target2_fidelity_plus, protoshot_target2_fidelity_minus = embed.fidelity_scores(
+        episode_support_data, query,
+        resize_the_batch(np.expand_dims(protoshot_target2_plus_image, axis=0)),
+        resize_the_batch(np.expand_dims(protoshot_target2_minus_image, axis=0)), idx=1)
+    print(
+        f'ProtoShotXAI_{target1_name} -> Fidelity+:{protoshot_target1_fidelity_plus}, Fidelity-:{protoshot_target1_fidelity_minus}')
+    print(
+        f'ProtoShotXAI_{target2_name} -> Fidelity+:{protoshot_target2_fidelity_plus}, Fidelity-:{protoshot_target2_fidelity_minus}')
 
     ## LIME XAI
     explainer = lime_image.LimeImageExplainer()
