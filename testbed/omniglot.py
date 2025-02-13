@@ -32,7 +32,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 def model_wrapper(images):
     """
     Wrapper function to handle a batch of images and pass them to the model for prediction.
-    Assumes images input shape is (batch_size, 84, 84, 3).
+    Assumes images input shape is (batch_size, 28, 28, 3).
     Returns predictions with shape (batch_size, class_number).
     """
     # Expand dimensions to match model input requirements
@@ -49,8 +49,8 @@ def model_wrapper(images):
     target_inds = tf.tile(target_inds, [1, n_query])
 
     cat = tf.concat([
-        tf.reshape(support, [n_class * n_support, 84, 84, 3]),
-        tf.reshape(query, [1 * n_query, 84, 84, 3])], axis=0)
+        tf.reshape(support, [n_class * n_support, 28, 28, 3]),
+        tf.reshape(query, [1 * n_query, 28, 28, 3])], axis=0)
     z = base_model.encoder(cat)
 
     z_prototypes = tf.reshape(z[:n_class * n_support], [n_class, n_support, z.shape[-1]])
@@ -75,14 +75,14 @@ def resize_the_batch(data):
 
     Returns:
     numpy.ndarray: A 4D numpy array containing the resized images,
-                   with shape (batch_size, 84, 84, channels).
+                   with shape (batch_size, 28, 28, channels).
     """
     batch_size, height, width, channels = data.shape
     resized_data = []
 
     for i in range(batch_size):
         img_array = data[i]
-        img_resized = cv2.resize(img_array, (84, 84), interpolation=cv2.INTER_AREA)
+        img_resized = cv2.resize(img_array, (28, 28), interpolation=cv2.INTER_AREA)
         resized_data.append(img_resized)
 
     return np.array(resized_data)
@@ -112,10 +112,10 @@ def print_dict_info(dictionary):
 if __name__ == '__main__':
 
     ### This few-shot XAI framwork need you to specify shot number.
-    shot = 5
-    k = 10
-    dataset_str = 'dogs'
-    padding_size = 6
+    shot = 4
+    k = 1
+    dataset_str = 'omniglot'
+    padding_size = 5
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
     # input_model_str = 'ResNet12'
@@ -207,18 +207,18 @@ if __name__ == '__main__':
             'target5_label': '056.Pine_Grosbeak',
         },
         'omniglot': {
-            'query_filename': '../data/pied_kingfisher_and_savannah_sparrow.pkl',
-            'support_filename': '../data/birds_train_data.npy',
-            'target1_name': 'pied_kingfisher',
-            'target2_name': 'savannah_sparrow',
-            'target3_name': 'tropical_kingbird',
-            'target4_name': 'white_breasted_nuthatch',
-            'target5_name': 'pine_grosbeak',
-            'target1_label': '081.Pied_Kingfisher',
-            'target2_label': '127.Savannah_Sparrow',
-            'target3_label': '077.Tropical_Kingbird',
-            'target4_label': '094.White_breasted_Nuthatch',
-            'target5_label': '056.Pine_Grosbeak',
+            'query_filename': '../data/Japanese_(hiragana).character28_and_Sanskrit.character40.pkl',
+            'support_filename': '../data/omniglot_train_data.npy',
+            'target1_name': 'Japanese_(hiragana).character28',
+            'target2_name': 'Sanskrit.character40',
+            'target3_name': 'Anglo_Saxon_Futhorc.character13',
+            'target4_name': 'Greek.character12',
+            'target5_name': 'Tifinagh.character45',
+            'target1_label': 'Japanese_(hiragana).character28',
+            'target2_label': 'Sanskrit.character40',
+            'target3_label': 'Anglo-Saxon_Futhorc.character13',
+            'target4_label': 'Greek.character12',
+            'target5_label': 'Tifinagh.character45',
         }
     }
     if dataset_str in dataset_map:
@@ -239,48 +239,52 @@ if __name__ == '__main__':
     query_dict = pickle.load(open(query_filename, 'rb'))
     # print_dict_info(query_dict)
     query_pickle = np.expand_dims(
-        preprocess_input(
-            pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}']),
+            pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}'],
         axis=0)
     support_dict = np.load(support_filename, allow_pickle=True).item()
     # print_dict_info(support_dict)
     '''
     This dictionary contains two keys: data and labels. The data key holds a4-dimensional NumPy 
-    array of shape (38400, 84, 84, 3), representing 38,400 RGB images with a resolution of 84x84 
+    array of shape (38400, 28, 28, 3), representing 38,400 RGB images with a resolution of 84x84 
     pixels each, stored as uint8 values. The labels key contains a 1-dimensional NumPy array of 
     shape (38400, ), where all entries are the string 'n01532829', 'n01532829', 'n01532829', ...,
     'n13133613', indicating that all images belong to the several different categories.
     '''
     support_data, support_labels = support_dict['data'], support_dict['labels']
-    support_data_target1, support_data_target2 = (resize_the_batch(
-        preprocess_input(support_data[support_labels == target1_label][:shot])),
-                                                  resize_the_batch(
-                                                      preprocess_input(
-                                                          support_data[support_labels == target2_label][:shot])))
+    support_data_target1, support_data_target2 = (np.expand_dims(resize_the_batch(
+        support_data[support_labels == target1_label][:shot]), axis=-1),
+                                                  np.expand_dims(resize_the_batch(
+                                                      support_data[support_labels == target2_label][:shot]), axis=-1))
 
     ### Load the associated model weights.
-    base_model = Prototypical(w=84, h=84, c=3, nb_layers=4, encoder_type=encoder_type)
-    base_model.encoder(tf.keras.Input((84, 84, 3)))
+    base_model = Prototypical(w=28, h=28, c=1, nb_layers=4, encoder_type=encoder_type)
+    base_model.encoder(tf.keras.Input((28, 28, 1)))
     base_model.encoder.load_weights(model_filename)
     base_model.encoder.summary()
-    rgb_query = resize_the_batch(  # For fidelity calculation.
-        np.expand_dims(
-            pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}'], axis=0)).squeeze() / 255
+    rgb_query = np.expand_dims(resize_the_batch(  # For fidelity calculation.
+        np.expand_dims(np.expand_dims(
+            pickle.load(open(query_filename, 'rb'))[f'{target1_name}_and_{target2_name}'], axis=0), axis=-1)), axis=-1)
     embed = Embed(base_model.encoder, feature_layer=flatten_layer)  # For fidelity calculation.
-    query = resize_the_batch(query_pickle)
+    query = np.expand_dims(resize_the_batch(np.expand_dims(query_pickle, axis=-1)), axis=-1)
     ### Create episode data.
     support_data_target3, support_data_target4, support_data_target5 = (
-        resize_the_batch(preprocess_input(support_data[support_labels == target3_label][:shot])),
-        resize_the_batch(preprocess_input(support_data[support_labels == target4_label][:shot])),
-        resize_the_batch(preprocess_input(support_data[support_labels == target5_label][:shot])))
+        np.expand_dims(resize_the_batch(support_data[support_labels == target3_label][:shot]), axis=-1),
+        np.expand_dims(resize_the_batch(support_data[support_labels == target4_label][:shot]), axis=-1),
+        np.expand_dims(resize_the_batch(support_data[support_labels == target5_label][:shot]), axis=-1))
     episode_support_data = np.concatenate(
         [np.expand_dims(support_data_target1, axis=0), np.expand_dims(support_data_target2, axis=0),
          np.expand_dims(support_data_target3, axis=0), np.expand_dims(support_data_target4, axis=0),
          np.expand_dims(support_data_target5, axis=0)], axis=0)
+    support_data_target2_merge = np.concatenate([support_data_target2,
+        support_data_target3, support_data_target4,
+         support_data_target5], axis=0)
+    support_data_target1_merge = np.concatenate([support_data_target1,
+        support_data_target3, support_data_target4,
+         support_data_target5], axis=0)
     exclude_support_data = np.concatenate(
         [support_data_target3, support_data_target4,
          support_data_target5], axis=0)
-    ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
+    ref_pixel = query_pickle[0, 0, :]  # Average background pixel after preprocessing.
     # print(f'Average background pixel: {ref_pixel}')
     ### C3A XAI
     c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
@@ -290,11 +294,12 @@ if __name__ == '__main__':
         support_data_3=exclude_support_data,
         query=query, ref_pixel=ref_pixel, pad=padding_size),
                                               c3a_xai.image_feature_attribution_c3a(
-                                                  support_data_1=support_data_target2,
-                                                  support_data_2=support_data_target1,
+                                                  support_data_1=support_data_target1,
+                                                  support_data_2=support_data_target2,
                                                   support_data_3=exclude_support_data,
                                                   query=query, ref_pixel=ref_pixel, pad=padding_size))
     ### Ploting functions.
+    query_pickle = np.expand_dims(query_pickle, axis=-1)
     plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
     plt.savefig(
         f"./results/{dataset_str}_feature_attribution_map/c3a_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
@@ -303,23 +308,23 @@ if __name__ == '__main__':
     plt.savefig(
         f"./results/{dataset_str}_feature_attribution_map/c3a_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
         dpi=450)
-    ## Fidelity calculation.
-    c3a_target1_plus_image, c3a_target1_minus_image = generate_masked_images(
-        feature_attributions=c3a_target1_scores, original_image=rgb_query,
-        input_percentile=99.9, mask_threshold=0.5)
-    c3a_target2_plus_image, c3a_target2_minus_image = generate_masked_images(
-        feature_attributions=c3a_target2_scores, original_image=rgb_query,
-        input_percentile=99.9, mask_threshold=0.5)
-    c3a_target1_fidelity_plus, c3a_target1_fidelity_minus = embed.fidelity_scores(
-        episode_support_data, query,
-        resize_the_batch(np.expand_dims(c3a_target1_plus_image, axis=0)),
-        resize_the_batch(np.expand_dims(c3a_target1_minus_image, axis=0)), idx=0)
-    c3a_target2_fidelity_plus, c3a_target2_fidelity_minus = embed.fidelity_scores(
-        episode_support_data, query,
-        resize_the_batch(np.expand_dims(c3a_target2_plus_image, axis=0)),
-        resize_the_batch(np.expand_dims(c3a_target2_minus_image, axis=0)), idx=1)
-    print(f'C3A_{target1_name} -> Fidelity+:{c3a_target1_fidelity_plus}, Fidelity-:{c3a_target1_fidelity_minus}')
-    print(f'C3A_{target2_name} -> Fidelity+:{c3a_target2_fidelity_plus}, Fidelity-:{c3a_target2_fidelity_minus}')
+    # ## Fidelity calculation.
+    # c3a_target1_plus_image, c3a_target1_minus_image = generate_masked_images(
+    #     feature_attributions=c3a_target1_scores, original_image=rgb_query,
+    #     input_percentile=99.9, mask_threshold=0.5)
+    # c3a_target2_plus_image, c3a_target2_minus_image = generate_masked_images(
+    #     feature_attributions=c3a_target2_scores, original_image=rgb_query,
+    #     input_percentile=99.9, mask_threshold=0.5)
+    # c3a_target1_fidelity_plus, c3a_target1_fidelity_minus = embed.fidelity_scores(
+    #     episode_support_data, query,
+    #     resize_the_batch(np.expand_dims(c3a_target1_plus_image, axis=0)),
+    #     resize_the_batch(np.expand_dims(c3a_target1_minus_image, axis=0)), idx=0)
+    # c3a_target2_fidelity_plus, c3a_target2_fidelity_minus = embed.fidelity_scores(
+    #     episode_support_data, query,
+    #     resize_the_batch(np.expand_dims(c3a_target2_plus_image, axis=0)),
+    #     resize_the_batch(np.expand_dims(c3a_target2_minus_image, axis=0)), idx=1)
+    # print(f'C3A_{target1_name} -> Fidelity+:{c3a_target1_fidelity_plus}, Fidelity-:{c3a_target1_fidelity_minus}')
+    # print(f'C3A_{target2_name} -> Fidelity+:{c3a_target2_fidelity_plus}, Fidelity-:{c3a_target2_fidelity_minus}')
     #
     ### ProtoShotXAI
     protoshot_xai = ProtoShotXAI(base_model.encoder, feature_layer=flatten_layer)
@@ -343,24 +348,24 @@ if __name__ == '__main__':
         f"./results/{dataset_str}_feature_attribution_map/protoshot_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
         dpi=450)
     ## Fidelity calculation.
-    protoshot_target1_plus_image, protoshot_target1_minus_image = generate_masked_images(
-        feature_attributions=protoshot_target1_scores, original_image=rgb_query,
-        input_percentile=99.9, mask_threshold=0.5)
-    protoshot_target2_plus_image, protoshot_target2_minus_image = generate_masked_images(
-        feature_attributions=protoshot_target2_scores, original_image=rgb_query,
-        input_percentile=99.9, mask_threshold=0.5)
-    protoshot_target1_fidelity_plus, protoshot_target1_fidelity_minus = embed.fidelity_scores(
-        episode_support_data, query,
-        resize_the_batch(np.expand_dims(protoshot_target1_plus_image, axis=0)),
-        resize_the_batch(np.expand_dims(protoshot_target1_minus_image, axis=0)), idx=0)
-    protoshot_target2_fidelity_plus, protoshot_target2_fidelity_minus = embed.fidelity_scores(
-        episode_support_data, query,
-        resize_the_batch(np.expand_dims(protoshot_target2_plus_image, axis=0)),
-        resize_the_batch(np.expand_dims(protoshot_target2_minus_image, axis=0)), idx=1)
-    print(
-        f'ProtoShotXAI_{target1_name} -> Fidelity+:{protoshot_target1_fidelity_plus}, Fidelity-:{protoshot_target1_fidelity_minus}')
-    print(
-        f'ProtoShotXAI_{target2_name} -> Fidelity+:{protoshot_target2_fidelity_plus}, Fidelity-:{protoshot_target2_fidelity_minus}')
+    # protoshot_target1_plus_image, protoshot_target1_minus_image = generate_masked_images(
+    #     feature_attributions=protoshot_target1_scores, original_image=rgb_query,
+    #     input_percentile=99.9, mask_threshold=0.5)
+    # protoshot_target2_plus_image, protoshot_target2_minus_image = generate_masked_images(
+    #     feature_attributions=protoshot_target2_scores, original_image=rgb_query,
+    #     input_percentile=99.9, mask_threshold=0.5)
+    # protoshot_target1_fidelity_plus, protoshot_target1_fidelity_minus = embed.fidelity_scores(
+    #     episode_support_data, query,
+    #     resize_the_batch(np.expand_dims(protoshot_target1_plus_image, axis=0)),
+    #     resize_the_batch(np.expand_dims(protoshot_target1_minus_image, axis=0)), idx=0)
+    # protoshot_target2_fidelity_plus, protoshot_target2_fidelity_minus = embed.fidelity_scores(
+    #     episode_support_data, query,
+    #     resize_the_batch(np.expand_dims(protoshot_target2_plus_image, axis=0)),
+    #     resize_the_batch(np.expand_dims(protoshot_target2_minus_image, axis=0)), idx=1)
+    # print(
+    #     f'ProtoShotXAI_{target1_name} -> Fidelity+:{protoshot_target1_fidelity_plus}, Fidelity-:{protoshot_target1_fidelity_minus}')
+    # print(
+    #     f'ProtoShotXAI_{target2_name} -> Fidelity+:{protoshot_target2_fidelity_plus}, Fidelity-:{protoshot_target2_fidelity_minus}')
 
     ## LIME XAI
     explainer = lime_image.LimeImageExplainer()
@@ -480,17 +485,17 @@ if __name__ == '__main__':
     # # Set algorithms parameters, input data shape, alpha and beta values
     # algo = 'felzenszwalb'  # algorithm name
     # params = {'scale': 50, 'sigma': 1.5, 'min_size': 150}
-    # shape = (84, 84, 3)  # data input shape
+    # shape = (28, 28, 3)  # data input shape
     # alpha = 150  # per-segment coalitions
     # beta = 0.15  # per-coalition active segments in % value
 
     # # Initialize sinex
-    # support_input = Input(shape=(shot, 84, 84, 3))
-    # query_input = Input(shape=(1, 84, 84, 3))
+    # support_input = Input(shape=(shot, 28, 28, 3))
+    # query_input = Input(shape=(1, 28, 28, 3))
     # query_features = base_model.encoder(query_input[0])
     # x_flattened = tf.reshape(query_features, [1, -1])
     # support_features = base_model.encoder(
-    #     tf.reshape(support_input, [shot, 84, 84, 3])
+    #     tf.reshape(support_input, [shot, 28, 28, 3])
     # )
     # prototypes = tf.reduce_mean(
     #     tf.reshape(support_features, [shot, -1]),

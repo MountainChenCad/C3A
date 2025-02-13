@@ -23,7 +23,7 @@ class C3Amodel:
         self.model = Model([support, query], features)
 
 
-    def compute_score_from_features(self,features,iclass):
+    def compute_score_from_features(self,features):
         ## This methods is ProtoShotXAI, which squeezes spatial dimensions
         s_feature_t, q_feature_t = features
         s_feature_t = s_feature_t.numpy()  # 形状: (1, 100, 7, 7, 2048)
@@ -197,7 +197,7 @@ class C3Amodel:
 
     def image_feature_attribution_contraprotoshot(self, support_data_1, support_data_2,
                                       support_data_3,
-                                      query, ref_pixel, pad=6, alpha=0.5, progress_bar=True):
+                                      query, ref_pixel, pad=6, alpha=0.2, progress_bar=True):
         rows = np.shape(query)[1]
         cols = np.shape(query)[2]
         chnls = np.shape(query)[3]
@@ -218,6 +218,8 @@ class C3Amodel:
         # ref_score = (self.compute_score_from_features_localshot(features_1)
         #              - self.compute_score_from_features_localshot(features_2)
         #              - 0.1*self.compute_score_from_features_localshot(features_3))
+        print(self.compute_score_from_features(features_1))
+        print(self.compute_score_from_features(features_2))
         ref_score = ((1 - alpha) * self.compute_score_from_features(features_1)
                      - alpha * self.compute_score_from_features(features_2))
         print(ref_score)
