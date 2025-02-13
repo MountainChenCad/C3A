@@ -5,7 +5,7 @@
 /experiments/
 /supplemental_material/
 /data
-/.idea
+.idea
 /supplementry_materials/
 .idea/workspace.xml
 *.xml
