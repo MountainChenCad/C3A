@@ -237,12 +237,16 @@ if __name__ == '__main__':
     ### C3A|contra+local- XAI
     c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
     c3a10_target1_scores, c3a10_target2_scores = (c3a_xai.image_feature_attribution_contraprotoshot(
-        support_data=support_data_target1,
+        support_data_1=support_data_target1,
+        support_data_2=support_data_target2,
+        support_data_3=exclude_support_data,
         query=query, ref_pixel=ref_pixel,
-        pad=padding_size
+        pad = padding_size
     ),
                                               c3a_xai.image_feature_attribution_contraprotoshot(
-                                                  support_data=support_data_target2,
+                                                  support_data_1=support_data_target2,
+                                                  support_data_2=support_data_target1,
+                                                  support_data_3=exclude_support_data,
                                                   query=query, ref_pixel=ref_pixel,
                                                   pad=padding_size
                                               ))
