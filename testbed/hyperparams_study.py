@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     ## To carry our ablation study, specify 'shot' or 'padding_size' or 'k'
     hyperparams_type = 'k'
-    dataset_str = 'cars'
+    dataset_str = 'birds'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
     # input_model_str = 'ResNet12'
