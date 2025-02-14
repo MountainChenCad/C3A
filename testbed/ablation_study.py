@@ -34,8 +34,8 @@ if __name__ == '__main__':
     ### This few-shot XAI framwork need you to specify shot number.
     shot = 1
     k = 10
-    padding_size = 6
-    dataset_str = 'dogs'
+    padding_size = 4
+    dataset_str = 'birds'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
     # input_model_str = 'ResNet12'
