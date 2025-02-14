@@ -126,23 +126,42 @@ def evaluate_explanation(model, feature_attribution_map, input_image, query, inp
 
     return iAUC, dAAC, insertion_curve, deletion_curve
 
-def plot_curves(insertion_curve, deletion_curve):
-    plt.figure(figsize=(10, 5))
+def plot_curves(insertion_curve, deletion_curve, save_path=None):
+    # 设置图像尺寸为长方形（宽度大于高度）
+    plt.figure(figsize=(10, 2))
+
+    # 归一化x轴到[0, 1]范围
+    x = np.linspace(0, 1, len(insertion_curve))
 
     # 绘制插入曲线
     plt.subplot(1, 2, 1)
-    plt.plot(insertion_curve, label='Insertion Curve')
-    plt.xlabel('Pixel Insertion Proportion')
-    plt.title('Insertion Curve')
+    plt.plot(x, insertion_curve, label='Insertion Curve')
+    plt.fill_between(x, insertion_curve, color='blue', alpha=0.1)
+    plt.xlabel('Pixels inserted')
     plt.legend()
-
+    plt.grid(color='gray', linewidth=0.5, alpha=0.5)  # 添加灰色网格线
+    for y_val in [0.2, 0.4, 0.6, 0.8]:
+        plt.axhline(y=y_val, color='gray', linewidth=0.5, alpha=0.5)
     # 绘制删除曲线
     plt.subplot(1, 2, 2)
-    plt.plot(deletion_curve, label='Deletion Curve')
-    plt.xlabel('Pixel Deletion Proportion')
-    plt.title('Deletion Curve')
+    plt.plot(x, deletion_curve, label='Deletion Curve')
+    plt.fill_between(x, deletion_curve, color='blue', alpha=0.1)
+    plt.xlabel('Pixels inserted')
     plt.legend()
+    plt.grid(color='gray', linewidth=0.5, alpha=0.5)  # 添加灰色网格线
+    for y_val in [0.2, 0.4, 0.6, 0.8]:
+        plt.axhline(y=y_val, color='gray', linewidth=0.5, alpha=0.5)
 
+    # 调整子图间距
+    plt.tight_layout()
+
+    # 如果提供了保存路径，则保存图像
+    if save_path:
+        # 保存为矢量图
+        plt.savefig(save_path, format='svg', dpi=300, bbox_inches='tight')
+        print(f"图像已保存至: {save_path}")
+
+        # 显示图像
     plt.show()
 
 if __name__ == '__main__':
@@ -304,80 +323,8 @@ if __name__ == '__main__':
          support_data_target5], axis=0)
     ref_pixel = query_pickle[0, 0, 0, :]  # Average background pixel after preprocessing.
     # print(f'Average background pixel: {ref_pixel}')
-    # ### C3A XAI
-    # c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
-    # c3a_target1_scores, c3a_target2_scores = (c3a_xai.image_feature_attribution_c3a(
-    #     support_data_1=support_data_target1,
-    #     support_data_2=support_data_target2,
-    #     support_data_3=exclude_support_data,
-    #     query=query, ref_pixel=ref_pixel, pad=padding_size),
-    #                                           c3a_xai.image_feature_attribution_c3a(
-    #                                               support_data_1=support_data_target2,
-    #                                               support_data_2=support_data_target1,
-    #                                               support_data_3=exclude_support_data,
-    #                                               query=query, ref_pixel=ref_pixel, pad=padding_size))
-    # ### Ploting functions.
-    # plt = xai_plot(c3a_target1_scores, resize_the_batch(query_pickle)[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/c3a_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
-    #     dpi=450)
-    # plt = xai_plot(c3a_target2_scores, resize_the_batch(query_pickle)[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/c3a_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
-    #     dpi=450)
-    # ## Fidelity calculation.
-    # c3a_target1_plus_image, c3a_target1_minus_image = generate_masked_images(
-    #     feature_attributions=c3a_target1_scores, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # c3a_target2_plus_image, c3a_target2_minus_image = generate_masked_images(
-    #     feature_attributions=c3a_target2_scores, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # c3a_target1_fidelity_plus, c3a_target1_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(c3a_target1_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(c3a_target1_minus_image, axis=0)), idx=0)
-    # c3a_target2_fidelity_plus, c3a_target2_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(c3a_target2_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(c3a_target2_minus_image, axis=0)), idx=1)
-    # print(f'C3A_{target1_name} -> Fidelity+:{c3a_target1_fidelity_plus}, Fidelity-:{c3a_target1_fidelity_minus}')
-    # print(f'C3A_{target2_name} -> Fidelity+:{c3a_target2_fidelity_plus}, Fidelity-:{c3a_target2_fidelity_minus}')
 
-    # ## GradCAM++ XAI
-    # # Find last conv laver (Use pre-determined layers instead).
-    # last_conv_layer_name = base_model.encoder.layers[layer_num].name
-    # gradcam = GradCam(base_model.encoder, last_conv_layer_name, episode_support_data)
-    # gradcam_target1_attributions = gradcam.make_gradcam_heatmap(np.expand_dims(query, axis=0), pred_index=0)
-    # plt = xai_plot(gradcam_target1_attributions, query[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/gardcam_{target1_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
-    # gradcam_target2_attributions = gradcam.make_gradcam_heatmap(np.expand_dims(query, axis=0), pred_index=1)
-    # plt = xai_plot(gradcam_target2_attributions, query[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/gardcam_{target2_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
-    # ### Fidelity calculation.
-    # gradcam_target1_plus_image, gradcam_target1_minus_image = generate_masked_images(
-    #     feature_attributions=gradcam_target1_attributions, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # gradcam_target2_plus_image, gradcam_target2_minus_image = generate_masked_images(
-    #     feature_attributions=gradcam_target2_attributions, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # gradcam_target1_fidelity_plus, gradcam_target1_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(gradcam_target1_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(gradcam_target1_minus_image, axis=0)), idx=0)
-    # gradcam_target2_fidelity_plus, gradcam_target2_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(gradcam_target2_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(gradcam_target2_minus_image, axis=0)), idx=1)
-    # print(
-    #     f'GradCAM++_{target1_name} -> Fidelity+:{gradcam_target1_fidelity_plus}, Fidelity-:{gradcam_target1_fidelity_minus}')
-    # print(
-    #     f'GradCAM++_{target2_name} -> Fidelity+:{gradcam_target2_fidelity_plus}, Fidelity-:{gradcam_target2_fidelity_minus}')
-
-    class_idx = 1
+    class_idx, class_num = 0, 5
     ### SINEXC XAI
     # Set algorithms parameters, input data shape, alpha and beta values
     algo = 'felzenszwalb'  # algorithm name
@@ -402,22 +349,68 @@ if __name__ == '__main__':
     model = Model(inputs=[support_input, query_input], outputs=-dists)
     sinex = Sinex(algo, params, shape)
     # Get SINEX explanations
-    E = sinex.explain(model, query.squeeze(0), episode_support_data)
-    for i in range(len(E)):
-        plt = xai_plot(E[i], episode_support_data[i][0])
-        plt.savefig(f"./results/{dataset_str}_episodic_xai/sinex_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
-    # 假设model, feature_attribution_map, input_image, class_idx已经定义
-    sinex_iAUC, sinex_dAAC, sinex_insertion_curve, sinex_deletion_curve = evaluate_explanation(model, E[class_idx], episode_support_data[class_idx], query)
-    plot_curves(sinex_insertion_curve, sinex_deletion_curve)
-    print(f'Eposidic SINEX: iAUC->{sinex_iAUC}, dAAC->{sinex_dAAC}.')
+    # E = sinex.explain(model, query.squeeze(0), episode_support_data)
+    # for i in range(len(E)):
+    #     plt = xai_plot(E[i], episode_support_data[i][0])
+    #     plt.savefig(f"./results/{dataset_str}_episodic_xai/sinex_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
+    # # 假设model, feature_attribution_map, input_image, class_idx已经定义
+    # sinex_iAUC, sinex_dAAC, sinex_insertion_curve, sinex_deletion_curve = evaluate_explanation(model, E[class_idx], episode_support_data[class_idx], query)
+    # plot_curves(sinex_insertion_curve, sinex_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/sinex_curves_{input_model_str}_{shot}shot.svg')
+    # print(f'Eposidic SINEX: iAUC->{sinex_iAUC}, dAAC->{sinex_dAAC}.')
+    #
+    # # Initialize SINEXC
+    # sinexc = Sinexc(algo, params, shape, alpha, beta)
+    # # Get SINEXC explanations
+    # Ec = sinexc.explain(model, query.squeeze(0), episode_support_data)
+    # for i in range(len(Ec)):
+    #     plt = xai_plot(Ec[i], episode_support_data[i][0])
+    #     plt.savefig(f"./results/{dataset_str}_episodic_xai/sinexc_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
+    # sinexc_iAUC, sinexc_dAAC, sinexc_insertion_curve, sinexc_deletion_curve = evaluate_explanation(model, Ec[class_idx], episode_support_data[class_idx], query)
+    # plot_curves(sinexc_insertion_curve, sinexc_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/sinex_curves_{input_model_str}_{shot}shot.svg')
+    # print(f'Eposidic SINEXC: iAUC->{sinexc_iAUC}, dAAC->{sinexc_dAAC}.')
 
-    # Initialize SINEXC
-    sinexc = Sinexc(algo, params, shape, alpha, beta)
-    # Get SINEXC explanations
-    Ec = sinexc.explain(model, query.squeeze(0), episode_support_data)
-    for i in range(len(Ec)):
-        plt = xai_plot(Ec[i], episode_support_data[i][0])
-        plt.savefig(f"./results/{dataset_str}_episodic_xai/sinexc_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
-    sinexc_iAUC, sinexc_dAAC, sinexc_insertion_curve, sinexc_deletion_curve = evaluate_explanation(model, Ec[class_idx], episode_support_data[class_idx], query)
-    plot_curves(sinexc_insertion_curve, sinexc_deletion_curve)
-    print(f'Eposidic SINEXC: iAUC->{sinexc_iAUC}, dAAC->{sinexc_dAAC}.')
+    # ### C3A XAI
+    c3a_xai = C3Amodel(base_model.encoder, feature_layer=feature_layer, k=k)
+    c3a_target_scores = []
+    for i in range(class_num):
+        exclude_data = np.concatenate((episode_support_data[:i, :, :, :, :], episode_support_data[i+1:, :, :, :, :]), axis=0)
+        c3a_target_scores.append(c3a_xai.image_feature_attribution_c3a(
+            support_data_1=query,
+            support_data_2=exclude_data.squeeze(1),
+            support_data_3=exclude_data.squeeze(1),
+            query=episode_support_data[i], ref_pixel=ref_pixel, pad=padding_size))
+    for i in range(len(c3a_target_scores)):
+        plt = xai_plot(c3a_target_scores[i], episode_support_data[i][0])
+        plt.savefig(f"./results/{dataset_str}_episodic_xai/c3a_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
+    c3a_iAUC, c3a_dAAC, c3a_insertion_curve, c3a_deletion_curve = evaluate_explanation(model, c3a_target_scores[class_idx], episode_support_data[class_idx], query)
+    plot_curves(c3a_insertion_curve, c3a_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/c3a_curves_{input_model_str}_{shot}shot.svg')
+    print(f'Eposidic C3A: iAUC->{c3a_iAUC}, dAAC->{c3a_dAAC}.')
+
+    ### ProtoShotXAI
+    protoshot_xai = ProtoShotXAI(base_model.encoder, feature_layer=flatten_layer)
+    protoshot_target_scores = []
+    for i in range(class_num):
+        protoshot_target_scores = protoshot_xai.image_feature_attribution(
+            support_data=query, query=episode_support_data[i], ref_pixel=ref_pixel,
+            pad=padding_size
+        )
+    for i in range(len(protoshot_target_scores)):
+        plt = xai_plot(protoshot_target_scores[i], episode_support_data[i][0])
+        plt.savefig(f"./results/{dataset_str}_episodic_xai/protoshot_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
+    protoshot_iAUC, protoshot_dAAC, protoshot_insertion_curve, protoshot_deletion_curve = evaluate_explanation(model, protoshot_target_scores[class_idx], episode_support_data[class_idx], query)
+    plot_curves(protoshot_insertion_curve, protoshot_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/protoshot_curves_{input_model_str}_{shot}shot.svg')
+    print(f'Eposidic ProtoShotXAI: iAUC->{protoshot_iAUC}, dAAC->{protoshot_dAAC}.')
+
+    ## GradCAM++ XAI
+    # Find last conv laver (Use pre-determined layers instead).
+    last_conv_layer_name = base_model.encoder.layers[layer_num].name
+    gradcam_target_scores = []
+    gradcam = GradCam(base_model.encoder, last_conv_layer_name, query)
+    for i in range(class_num):
+        gradcam_target_scores = gradcam.make_gradcam_heatmap(np.expand_dims(episode_support_data[i], axis=0), pred_index=0)
+    for i in range(len(gradcam_target_scores)):
+        plt = xai_plot(gradcam_target_scores[i], episode_support_data[i][0])
+        plt.savefig(f"./results/{dataset_str}_episodic_xai/gradcam_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
+    gradcam_iAUC, gradcam_dAAC, gradcam_insertion_curve, gradcam_deletion_curve = evaluate_explanation(model, gradcam_target_scores[class_idx], episode_support_data[class_idx], query)
+    plot_curves(gradcam_insertion_curve, gradcam_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/gradcam_curves_{input_model_str}_{shot}shot.svg')
+    print(f'Eposidic GradCAM++: iAUC->{gradcam_iAUC}, dAAC->{gradcam_dAAC}.')
