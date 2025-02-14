@@ -32,7 +32,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 if __name__ == '__main__':
 
     ## To carry our ablation study, specify 'shot' or 'padding_size' or 'k'
-    hyperparams_type = 'shot'
+    hyperparams_type = 'k'
     dataset_str = 'cars'
     ### In our experiments, we only focus on Conv64F and ResNet12 backbone.
     input_model_str = 'Conv64F'
