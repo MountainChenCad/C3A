@@ -16,6 +16,7 @@ from tensorflow.keras.models import load_model
 from architectures.protoshotxai import ProtoShotXAI  # ProtoShotXAI
 from utils.ploting_function import xai_plot
 import matplotlib.pyplot as plt
+from miniImagenet_dogs_cars_birds import print_dict_info, print_ndarray_info, resize_the_batch, model_wrapper
 from protonet_tf2.protonet.models.prototypical import Prototypical, calc_euclidian_dists
 from architectures.c3a import C3Amodel  # C3A XAI
 from tensorflow.keras.applications.resnet50 import preprocess_input, ResNet50
@@ -28,86 +29,121 @@ from SINEX.code.sinexc import Sinexc  # SINEX/SINEXC XAI
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 
-
-def model_wrapper(images):
-    """
-    Wrapper function to handle a batch of images and pass them to the model for prediction.
-    Assumes images input shape is (batch_size, 84, 84, 3).
-    Returns predictions with shape (batch_size, class_number).
-    """
-    # Expand dimensions to match model input requirements
-    query = tf.cast(np.expand_dims(images, axis=0), tf.float32)
-    support = tf.cast(episode_support_data, tf.float32)
-
-    n_class = support.shape[0]
-    n_support = support.shape[1]
-    n_query = query.shape[1]
-    y = np.tile(np.arange(n_class)[:, np.newaxis], (1, n_query))
-    y_onehot = tf.cast(tf.one_hot(y, n_class), tf.float32)
-
-    target_inds = tf.reshape(tf.range(n_class), [n_class, 1])
-    target_inds = tf.tile(target_inds, [1, n_query])
-
-    cat = tf.concat([
-        tf.reshape(support, [n_class * n_support, 84, 84, 3]),
-        tf.reshape(query, [1 * n_query, 84, 84, 3])], axis=0)
-    z = base_model.encoder(cat)
-
-    z_prototypes = tf.reshape(z[:n_class * n_support], [n_class, n_support, z.shape[-1]])
-    z_prototypes = tf.math.reduce_mean(z_prototypes, axis=1)
-    z_query = z[n_class * n_support:]
-    dists = calc_euclidian_dists(z_query, z_prototypes)
-    log_p_y = tf.nn.log_softmax(-dists, axis=-1)
-    # Collect predictions
-    predictions = tf.exp(log_p_y)
-
-    return predictions
+import numpy as np
+import tensorflow as tf
 
 
-def resize_the_batch(data):
-    """
-    resize a batch of images to the specified dimensions.
+def calculate_iAUC(model, feature_attribution_map, input_image, query):
+    # 初始化一个空的输入（全黑的频谱图）
+    empty_input = np.zeros_like(input_image)
 
-    Parameters:
-    data (numpy.ndarray): A 4D numpy array of shape (batch_size, height, width, channels),
-                         where batch_size is the number of images, height and width
-                         are the dimensions of each image, and channels are the color channels.
+    # 获取像素的重要性排序
+    sorted_indices = np.argsort(feature_attribution_map, axis=None)[::-1]
 
-    Returns:
-    numpy.ndarray: A 4D numpy array containing the resized images,
-                   with shape (batch_size, 84, 84, channels).
-    """
-    batch_size, height, width, channels = data.shape
-    resized_data = []
+    # 逐步插入像素并记录模型输出
+    model_outputs = []
+    for i in range(len(sorted_indices)):
+        # 获取当前像素的坐标
+        idx = np.unravel_index(sorted_indices[i], input_image.shape)
 
-    for i in range(batch_size):
-        img_array = data[i]
-        img_resized = cv2.resize(img_array, (84, 84), interpolation=cv2.INTER_AREA)
-        resized_data.append(img_resized)
+        # 插入像素
+        empty_input[idx] = input_image[idx]
 
-    return np.array(resized_data)
+        # 将输入转换为模型所需的格式
+        support_input = np.expand_dims(empty_input, axis=0)
+        query_input = np.expand_dims(query, axis=0)
+
+        # 获取模型输出
+        output = model([support_input, query_input])
+        model_outputs.append(output[0])
+
+    model_outputs = normalize_list(model_outputs)
+        # 计算iAUC
+    iAUC = np.trapz(model_outputs, dx=1.0 / len(sorted_indices))
+
+    return iAUC, model_outputs
 
 
-def print_ndarray_info(ndarray):
-    print(f"Data type: {ndarray.dtype}")
-    print(f"Shape: {ndarray.shape}")
-    print(f"Number of dimensions: {ndarray.ndim}")
-    print(f"Total number of elements: {ndarray.size}")
-    print(f"Bytes per element: {ndarray.itemsize}")
+def calculate_dAAC(model, feature_attribution_map, input_image, query):
+    # 初始化一个完整的输入（原始的频谱图）
+    full_input = np.copy(input_image)
+
+    # 获取像素的重要性排序
+    sorted_indices = np.argsort(feature_attribution_map, axis=None)[::-1]
+
+    # 逐步删除像素并记录模型输出
+    model_outputs = []
+    for i in range(len(sorted_indices)):
+        # 获取当前像素的坐标
+        idx = np.unravel_index(sorted_indices[i], input_image.shape)
+
+        # 删除像素
+        full_input[idx] = 0
+
+        # 将输入转换为模型所需的格式
+        support_input = np.expand_dims(full_input, axis=0)
+        query_input = np.expand_dims(query, axis=0)
+
+        # 获取模型输出
+        output = model([support_input, query_input])
+        model_outputs.append(output[0])
+
+    model_outputs = normalize_list(model_outputs)
+        # 计算dAAC
+    dAAC = np.trapz(model_outputs, dx=1.0 / len(sorted_indices))
+
+    return dAAC, model_outputs
+
+def normalize_list(lst):
+    min_val = min(lst)
+    max_val = max(lst)
+    normalized_lst = [(x - min_val) / (max_val - min_val) for x in lst]
+    return normalized_lst
+
+def normalize_feature_attribution(feature_attributions, input_percentile=99):
+    # 归一化处理
+    abs_vals = np.abs(feature_attributions)
+    max_val = np.nanpercentile(abs_vals, input_percentile)
+
+    vmin = -max_val
+    vmax = max_val
+
+    normalized = (feature_attributions - vmin) / (vmax - vmin)
+    normalized = np.clip(normalized, 0, 1)  # 确保值在0到1之间
+
+    return normalized
 
 
-def print_dict_info(dictionary):
-    # Print keys
-    print("Keys:", dictionary.keys())
-    # Print values
-    print("Values:", dictionary.values())
-    # Print key-value pairs
-    print("Key-Value Pairs:", dictionary.items())
-    # Print dictionary length (number of key-value pairs)
-    print("Length:", len(dictionary))
-    # Print the full dictionary
-    print("Full Dictionary:", dictionary)
+def evaluate_explanation(model, feature_attribution_map, input_image, query, input_percentile=99):
+    # 归一化feature_attribution_map
+    normalized_attribution = normalize_feature_attribution(feature_attribution_map, input_percentile)
 
+    # 计算iAUC和插入曲线
+    iAUC, insertion_curve = calculate_iAUC(model, normalized_attribution, input_image, query)
+
+    # 计算dAAC和删除曲线
+    dAAC, deletion_curve = calculate_dAAC(model, normalized_attribution, input_image, query)
+
+    return iAUC, dAAC, insertion_curve, deletion_curve
+
+def plot_curves(insertion_curve, deletion_curve):
+    plt.figure(figsize=(10, 5))
+
+    # 绘制插入曲线
+    plt.subplot(1, 2, 1)
+    plt.plot(insertion_curve, label='Insertion Curve')
+    plt.xlabel('Pixel Insertion Proportion')
+    plt.title('Insertion Curve')
+    plt.legend()
+
+    # 绘制删除曲线
+    plt.subplot(1, 2, 2)
+    plt.plot(deletion_curve, label='Deletion Curve')
+    plt.xlabel('Pixel Deletion Proportion')
+    plt.title('Deletion Curve')
+    plt.legend()
+
+    plt.show()
 
 if __name__ == '__main__':
 
@@ -306,128 +342,7 @@ if __name__ == '__main__':
     #     resize_the_batch(np.expand_dims(c3a_target2_minus_image, axis=0)), idx=1)
     # print(f'C3A_{target1_name} -> Fidelity+:{c3a_target1_fidelity_plus}, Fidelity-:{c3a_target1_fidelity_minus}')
     # print(f'C3A_{target2_name} -> Fidelity+:{c3a_target2_fidelity_plus}, Fidelity-:{c3a_target2_fidelity_minus}')
-    # #
-    # ### ProtoShotXAI
-    # protoshot_xai = ProtoShotXAI(base_model.encoder, feature_layer=flatten_layer)
-    # protoshot_target1_scores, protoshot_target2_scores = (protoshot_xai.image_feature_attribution(
-    #     support_data=support_data_target1, query=query, ref_pixel=ref_pixel,
-    #     pad=padding_size
-    # ),
-    #                                                       protoshot_xai.image_feature_attribution(
-    #                                                           support_data=support_data_target2, query=query,
-    #                                                           ref_pixel=ref_pixel,
-    #                                                           pad=padding_size
-    #                                                       ))
-    # ### Ploting functions.
-    # plt = xai_plot(protoshot_target1_scores, resize_the_batch(query_pickle)[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/protoshot_{target1_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
-    #     dpi=450)
-    #
-    # plt = xai_plot(protoshot_target2_scores, resize_the_batch(query_pickle)[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/protoshot_{target2_name}_Features_{input_model_str}_{shot}shot_{padding_size}size.png",
-    #     dpi=450)
-    # ## Fidelity calculation.
-    # protoshot_target1_plus_image, protoshot_target1_minus_image = generate_masked_images(
-    #     feature_attributions=protoshot_target1_scores, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # protoshot_target2_plus_image, protoshot_target2_minus_image = generate_masked_images(
-    #     feature_attributions=protoshot_target2_scores, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # protoshot_target1_fidelity_plus, protoshot_target1_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(protoshot_target1_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(protoshot_target1_minus_image, axis=0)), idx=0)
-    # protoshot_target2_fidelity_plus, protoshot_target2_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(protoshot_target2_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(protoshot_target2_minus_image, axis=0)), idx=1)
-    # print(
-    #     f'ProtoShotXAI_{target1_name} -> Fidelity+:{protoshot_target1_fidelity_plus}, Fidelity-:{protoshot_target1_fidelity_minus}')
-    # print(
-    #     f'ProtoShotXAI_{target2_name} -> Fidelity+:{protoshot_target2_fidelity_plus}, Fidelity-:{protoshot_target2_fidelity_minus}')
-    #
-    # ## LIME XAI
-    # explainer = lime_image.LimeImageExplainer()
-    # lime_explanation = explainer.explain_instance(
-    #     image=query.squeeze(),
-    #     classifier_fn=model_wrapper,
-    #     top_labels=5,
-    #     hide_color=0,
-    #     num_samples=1000
-    # )
-    # lime_index_target1 = np.where(np.array(lime_explanation.top_labels) == 0)[0][0]
-    # lime_index_target2 = np.where(np.array(lime_explanation.top_labels) == 1)[0][0]
-    # ### Attribution calculation and ploting.
-    # _, lime_target1_attributions = lime_explanation.get_image_and_mask(lime_explanation.top_labels[lime_index_target1],
-    #                                                                    positive_only=False, num_features=10,
-    #                                                                    hide_rest=False)
-    # plt = xai_plot(lime_target1_attributions, query[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/lime_{target1_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
-    # _, lime_target2_attributions = lime_explanation.get_image_and_mask(lime_explanation.top_labels[lime_index_target2],
-    #                                                                    positive_only=False, num_features=10,
-    #                                                                    hide_rest=False)
-    # plt = xai_plot(lime_target2_attributions, query[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/lime_{target2_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
-    # ### Fidelity calculation.
-    # lime_target1_plus_image, lime_target1_minus_image = generate_masked_images(
-    #     feature_attributions=lime_target1_attributions, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # lime_target2_plus_image, lime_target2_minus_image = generate_masked_images(
-    #     feature_attributions=lime_target2_attributions, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # lime_target1_fidelity_plus, lime_target1_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(lime_target1_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(lime_target1_minus_image, axis=0)), idx=0)
-    # lime_target2_fidelity_plus, lime_target2_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(lime_target2_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(lime_target2_minus_image, axis=0)), idx=1)
-    # print(f'LIME_{target1_name} -> Fidelity+:{lime_target1_fidelity_plus}, Fidelity-:{lime_target1_fidelity_minus}')
-    # print(f'LIME_{target2_name} -> Fidelity+:{lime_target2_fidelity_plus}, Fidelity-:{lime_target2_fidelity_minus}')
-    #
-    # ## SHAP XAI
-    # explainer = ProtoNetSHAPExplainer(
-    #     model=base_model.encoder,
-    #     last_conv_layer_name=last_conv_name,
-    #     support=episode_support_data,
-    #     shot=shot,
-    #     n_class=5
-    # )
-    # shap_target1_attributions = explainer.explain(query, class_index=0)
-    # plt = xai_plot(shap_target1_attributions, query[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/shap_{target1_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
-    # shap_target2_attributions = explainer.explain(query, class_index=1)
-    # plt = xai_plot(shap_target2_attributions, query[0])
-    # plt.savefig(
-    #     f"./results/{dataset_str}_feature_attribution_map/shap_{target2_name}_Features_{input_model_str}_{shot}shot.png",
-    #     dpi=450)
-    # ### Fidelity calculation.
-    # shap_target1_plus_image, shap_target1_minus_image = generate_masked_images(
-    #     feature_attributions=shap_target1_attributions, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # shap_target2_plus_image, shap_target2_minus_image = generate_masked_images(
-    #     feature_attributions=shap_target2_attributions, original_image=rgb_query,
-    #     input_percentile=99.9, mask_threshold=0.5)
-    # shap_target1_fidelity_plus, shap_target1_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(shap_target1_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(shap_target1_minus_image, axis=0)), idx=0)
-    # shap_target2_fidelity_plus, shap_target2_fidelity_minus = embed.fidelity_scores(
-    #     episode_support_data, query,
-    #     resize_the_batch(np.expand_dims(shap_target2_plus_image, axis=0)),
-    #     resize_the_batch(np.expand_dims(shap_target2_minus_image, axis=0)), idx=1)
-    # print(f'SHAP_{target1_name} -> Fidelity+:{shap_target1_fidelity_plus}, Fidelity-:{shap_target1_fidelity_minus}')
-    # print(f'SHAP_{target2_name} -> Fidelity+:{shap_target2_fidelity_plus}, Fidelity-:{shap_target2_fidelity_minus}')
-    #
+
     # ## GradCAM++ XAI
     # # Find last conv laver (Use pre-determined layers instead).
     # last_conv_layer_name = base_model.encoder.layers[layer_num].name
@@ -462,6 +377,7 @@ if __name__ == '__main__':
     # print(
     #     f'GradCAM++_{target2_name} -> Fidelity+:{gradcam_target2_fidelity_plus}, Fidelity-:{gradcam_target2_fidelity_minus}')
 
+    class_idx = 1
     ### SINEXC XAI
     # Set algorithms parameters, input data shape, alpha and beta values
     algo = 'felzenszwalb'  # algorithm name
@@ -490,6 +406,11 @@ if __name__ == '__main__':
     for i in range(len(E)):
         plt = xai_plot(E[i], episode_support_data[i][0])
         plt.savefig(f"./results/{dataset_str}_episodic_xai/sinex_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
+    # 假设model, feature_attribution_map, input_image, class_idx已经定义
+    sinex_iAUC, sinex_dAAC, sinex_insertion_curve, sinex_deletion_curve = evaluate_explanation(model, E[class_idx], episode_support_data[class_idx], query)
+    plot_curves(sinex_insertion_curve, sinex_deletion_curve)
+    print(f'Eposidic SINEX: iAUC->{sinex_iAUC}, dAAC->{sinex_dAAC}.')
+
     # Initialize SINEXC
     sinexc = Sinexc(algo, params, shape, alpha, beta)
     # Get SINEXC explanations
@@ -497,3 +418,6 @@ if __name__ == '__main__':
     for i in range(len(Ec)):
         plt = xai_plot(Ec[i], episode_support_data[i][0])
         plt.savefig(f"./results/{dataset_str}_episodic_xai/sinexc_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
+    sinexc_iAUC, sinexc_dAAC, sinexc_insertion_curve, sinexc_deletion_curve = evaluate_explanation(model, Ec[class_idx], episode_support_data[class_idx], query)
+    plot_curves(sinexc_insertion_curve, sinexc_deletion_curve)
+    print(f'Eposidic SINEXC: iAUC->{sinexc_iAUC}, dAAC->{sinexc_dAAC}.')
