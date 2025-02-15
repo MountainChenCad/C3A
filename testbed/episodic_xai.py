@@ -167,14 +167,19 @@ def plot_curves(insertion_curve, deletion_curve, save_path=None):
     # 如果提供了保存路径，则保存图像
     if save_path:
         # 保存为矢量图
-        plt.savefig(save_path, format='svg', dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, format='pdf', dpi=300, bbox_inches='tight')
         print(f"图像已保存至: {save_path}")
 
         # 显示图像
     plt.show()
 
 if __name__ == '__main__':
-
+        ### 这段代码要修改成多次重复实验的逻辑，至少重复5次，每次5个。曲线展示平均曲线。图像展示个例。
+        ### 首先要解决存储，获得任务的问题。可以通过mapping的方式得到，除了累一点没有什么的。
+        ### 其次是解决计算的问题，计算过程中要存储中间变量，要展示计算到第几个了。
+        ### -> 这里想到，图像的生成和计算过程其实可以一起做，本来图像是5个，计算只有一个很耗时，现在不会了。
+        ### -> score最后求和取平均。可以画出上下界（每个均值的标准差）和均值则更好。
+        ### -> 为了保障计算顺利，每个方法可以单独计算，也可以循环遍历各个方法和数据集一气呵成。
     for dataset_str in ['birds', 'cars', 'dogs']:
         ### This few-shot XAI framwork need you to specify shot number.
         shot = 1
@@ -373,7 +378,7 @@ if __name__ == '__main__':
             plt = xai_plot(c3a_target_scores[i], episode_support_data[i][0])
             plt.savefig(f"./results/{dataset_str}_episodic_xai/c3a_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
         c3a_iAUC, c3a_dAAC, c3a_insertion_curve, c3a_deletion_curve = evaluate_explanation(model, c3a_target_scores[class_idx], episode_support_data[class_idx], query)
-        plot_curves(c3a_insertion_curve, c3a_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/c3a_curves_{input_model_str}_{shot}shot.svg')
+        plot_curves(c3a_insertion_curve, c3a_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/c3a_curves_{input_model_str}_{shot}shot.pdf')
         print(f'Eposidic C3A: iAUC->{c3a_iAUC}, dAAC->{c3a_dAAC}.')
         #
         ### ProtoShotXAI
@@ -388,7 +393,7 @@ if __name__ == '__main__':
             plt = xai_plot(protoshot_target_scores[i], episode_support_data[i][0])
             plt.savefig(f"./results/{dataset_str}_episodic_xai/protoshot_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
         protoshot_iAUC, protoshot_dAAC, protoshot_insertion_curve, protoshot_deletion_curve = evaluate_explanation(model, protoshot_target_scores[class_idx], episode_support_data[class_idx], query)
-        plot_curves(protoshot_insertion_curve, protoshot_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/protoshot_curves_{input_model_str}_{shot}shot.svg')
+        plot_curves(protoshot_insertion_curve, protoshot_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/protoshot_curves_{input_model_str}_{shot}shot.pdf')
         print(f'Eposidic ProtoShotXAI: iAUC->{protoshot_iAUC}, dAAC->{protoshot_dAAC}.')
 
         sinex = Sinex(algo, params, shape)
@@ -399,7 +404,7 @@ if __name__ == '__main__':
             plt.savefig(f"./results/{dataset_str}_episodic_xai/sinex_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
         # 假设model, feature_attribution_map, input_image, class_idx已经定义
         sinex_iAUC, sinex_dAAC, sinex_insertion_curve, sinex_deletion_curve = evaluate_explanation(model, E[class_idx], episode_support_data[class_idx], query)
-        plot_curves(sinex_insertion_curve, sinex_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/sinex_curves_{input_model_str}_{shot}shot.svg')
+        plot_curves(sinex_insertion_curve, sinex_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/sinex_curves_{input_model_str}_{shot}shot.pdf')
         print(f'Eposidic SINEX: iAUC->{sinex_iAUC}, dAAC->{sinex_dAAC}.')
 
         # Initialize SINEXC
@@ -410,7 +415,7 @@ if __name__ == '__main__':
             plt = xai_plot(Ec[i], episode_support_data[i][0])
             plt.savefig(f"./results/{dataset_str}_episodic_xai/sinexc_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
         sinexc_iAUC, sinexc_dAAC, sinexc_insertion_curve, sinexc_deletion_curve = evaluate_explanation(model, Ec[class_idx], episode_support_data[class_idx], query)
-        plot_curves(sinexc_insertion_curve, sinexc_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/sinexc_curves_{input_model_str}_{shot}shot.svg')
+        plot_curves(sinexc_insertion_curve, sinexc_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/sinexc_curves_{input_model_str}_{shot}shot.pdf')
         print(f'Eposidic SINEXC: iAUC->{sinexc_iAUC}, dAAC->{sinexc_dAAC}.')
 
         ## GradCAM++ XAI
@@ -424,5 +429,5 @@ if __name__ == '__main__':
             plt = xai_plot(gradcam_target_scores[i], episode_support_data[i][0])
             plt.savefig(f"./results/{dataset_str}_episodic_xai/gradcam_{i}_Features_{input_model_str}_{shot}shot.png",dpi=450)
         gradcam_iAUC, gradcam_dAAC, gradcam_insertion_curve, gradcam_deletion_curve = evaluate_explanation(model, gradcam_target_scores[class_idx], episode_support_data[class_idx], query)
-        plot_curves(gradcam_insertion_curve, gradcam_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/gradcam_curves_{input_model_str}_{shot}shot.svg')
+        plot_curves(gradcam_insertion_curve, gradcam_deletion_curve, save_path=f'./results/{dataset_str}_episodic_xai/gradcam_curves_{input_model_str}_{shot}shot.pdf')
         print(f'Eposidic GradCAM++: iAUC->{gradcam_iAUC}, dAAC->{gradcam_dAAC}.')
