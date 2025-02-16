@@ -1,0 +1,220 @@
+Running train mode with omniglot configuration file
+2025-02-16 08:35:58.807187: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcuda.so.1
+2025-02-16 08:35:58.987983: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:58.988659: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 1 with properties: 
+pciBusID: 0000:23:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:58.989237: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 2 with properties: 
+pciBusID: 0000:41:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:58.989788: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 3 with properties: 
+pciBusID: 0000:61:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:58.990339: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 4 with properties: 
+pciBusID: 0000:81:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:58.990884: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 5 with properties: 
+pciBusID: 0000:a1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:58.991443: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 6 with properties: 
+pciBusID: 0000:c1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:58.991977: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 7 with properties: 
+pciBusID: 0000:e1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:58.992340: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2025-02-16 08:35:58.993922: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2025-02-16 08:35:58.995842: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10
+2025-02-16 08:35:58.996181: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10
+2025-02-16 08:35:58.997712: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10
+2025-02-16 08:35:58.998570: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10
+2025-02-16 08:35:59.001735: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2025-02-16 08:35:59.009505: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0, 1, 2, 3, 4, 5, 6, 7
+2025-02-16 08:35:59.010139: I tensorflow/core/platform/cpu_feature_guard.cc:143] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2025-02-16 08:35:59.036804: I tensorflow/core/platform/profile_utils/cpu_utils.cc:102] CPU Frequency: 2799880000 Hz
+2025-02-16 08:35:59.042238: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7fd19c000b70 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2025-02-16 08:35:59.042336: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2025-02-16 08:35:59.763097: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7fccd4000b70 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2025-02-16 08:35:59.763205: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:35:59.763252: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (1): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:35:59.763281: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (2): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:35:59.763308: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (3): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:35:59.763335: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (4): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:35:59.763360: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (5): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:35:59.763387: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (6): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:35:59.763413: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (7): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:35:59.766426: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:59.766960: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 1 with properties: 
+pciBusID: 0000:23:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:59.767502: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 2 with properties: 
+pciBusID: 0000:41:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:59.768035: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 3 with properties: 
+pciBusID: 0000:61:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:59.768555: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 4 with properties: 
+pciBusID: 0000:81:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:59.769038: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 5 with properties: 
+pciBusID: 0000:a1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:59.769575: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 6 with properties: 
+pciBusID: 0000:c1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:59.770076: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 7 with properties: 
+pciBusID: 0000:e1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:35:59.770179: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2025-02-16 08:35:59.770232: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2025-02-16 08:35:59.770264: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10
+2025-02-16 08:35:59.770296: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10
+2025-02-16 08:35:59.770327: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10
+2025-02-16 08:35:59.770356: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10
+2025-02-16 08:35:59.770386: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2025-02-16 08:35:59.777575: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0, 1, 2, 3, 4, 5, 6, 7
+2025-02-16 08:35:59.777652: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2025-02-16 08:35:59.781038: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102] Device interconnect StreamExecutor with strength 1 edge matrix:
+2025-02-16 08:35:59.781119: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1108]      0 1 2 3 4 5 6 7 
+2025-02-16 08:35:59.781154: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 0:   N N N N N N N N 
+2025-02-16 08:35:59.781184: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 1:   N N N N N N N N 
+2025-02-16 08:35:59.781214: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 2:   N N N N N N N N 
+2025-02-16 08:35:59.781243: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 3:   N N N N N N N N 
+2025-02-16 08:35:59.781273: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 4:   N N N N N N N N 
+2025-02-16 08:35:59.781301: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 5:   N N N N N N N N 
+2025-02-16 08:35:59.781330: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 6:   N N N N N N N N 
+2025-02-16 08:35:59.781358: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 7:   N N N N N N N N 
+2025-02-16 08:35:59.785569: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 22387 MB memory) -> physical GPU (device: 0, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:01:00.0, compute capability: 8.9)
+2025-02-16 08:35:59.786490: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:1 with 22387 MB memory) -> physical GPU (device: 1, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:23:00.0, compute capability: 8.9)
+2025-02-16 08:35:59.787319: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:2 with 22387 MB memory) -> physical GPU (device: 2, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:41:00.0, compute capability: 8.9)
+2025-02-16 08:35:59.788164: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:3 with 22387 MB memory) -> physical GPU (device: 3, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:61:00.0, compute capability: 8.9)
+2025-02-16 08:35:59.788858: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:4 with 22387 MB memory) -> physical GPU (device: 4, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:81:00.0, compute capability: 8.9)
+2025-02-16 08:35:59.789598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:5 with 22387 MB memory) -> physical GPU (device: 5, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:a1:00.0, compute capability: 8.9)
+2025-02-16 08:35:59.790343: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:6 with 22387 MB memory) -> physical GPU (device: 6, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:c1:00.0, compute capability: 8.9)
+2025-02-16 08:35:59.791043: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:7 with 22387 MB memory) -> physical GPU (device: 7, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:e1:00.0, compute capability: 8.9)
+Number of devices: 8
+Traceback (most recent call last):
+  File "scripts/train/run_train.py", line 62, in <module>
+    train(config)
+  File "/root/shared-nvme/protonet_tf2/scripts/train/train_setup.py", line 194, in train
+    n_episodes=config['data.episodes']
+TypeError: train() missing 1 required positional argument: 'loss_func'
+Running train mode with omniglot configuration file
+2025-02-16 08:59:43.156507: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcuda.so.1
+2025-02-16 08:59:43.301924: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:43.302473: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 1 with properties: 
+pciBusID: 0000:23:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:43.302956: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 2 with properties: 
+pciBusID: 0000:41:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:43.303438: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 3 with properties: 
+pciBusID: 0000:61:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:43.303920: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 4 with properties: 
+pciBusID: 0000:81:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:43.304397: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 5 with properties: 
+pciBusID: 0000:a1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:43.304877: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 6 with properties: 
+pciBusID: 0000:c1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:43.305352: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 7 with properties: 
+pciBusID: 0000:e1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:43.305651: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2025-02-16 08:59:43.307089: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2025-02-16 08:59:43.308932: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10
+2025-02-16 08:59:43.309188: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10
+2025-02-16 08:59:43.310651: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10
+2025-02-16 08:59:43.311405: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10
+2025-02-16 08:59:43.314368: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2025-02-16 08:59:43.321745: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0, 1, 2, 3, 4, 5, 6, 7
+2025-02-16 08:59:43.322450: I tensorflow/core/platform/cpu_feature_guard.cc:143] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2025-02-16 08:59:43.348735: I tensorflow/core/platform/profile_utils/cpu_utils.cc:102] CPU Frequency: 2799880000 Hz
+2025-02-16 08:59:43.354083: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7fbad4000b70 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2025-02-16 08:59:43.354195: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2025-02-16 08:59:44.020263: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7fb60c000b70 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2025-02-16 08:59:44.020361: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:59:44.020381: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (1): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:59:44.020397: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (2): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:59:44.020413: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (3): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:59:44.020429: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (4): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:59:44.020445: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (5): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:59:44.020477: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (6): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:59:44.020506: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (7): NVIDIA GeForce RTX 4090, Compute Capability 8.9
+2025-02-16 08:59:44.023499: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:44.023980: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 1 with properties: 
+pciBusID: 0000:23:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:44.024434: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 2 with properties: 
+pciBusID: 0000:41:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:44.024915: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 3 with properties: 
+pciBusID: 0000:61:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:44.025387: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 4 with properties: 
+pciBusID: 0000:81:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:44.025841: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 5 with properties: 
+pciBusID: 0000:a1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:44.026305: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 6 with properties: 
+pciBusID: 0000:c1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:44.026758: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 7 with properties: 
+pciBusID: 0000:e1:00.0 name: NVIDIA GeForce RTX 4090 computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 128 deviceMemorySize: 23.64GiB deviceMemoryBandwidth: 938.86GiB/s
+2025-02-16 08:59:44.026813: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2025-02-16 08:59:44.026835: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+2025-02-16 08:59:44.026854: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10
+2025-02-16 08:59:44.026873: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10
+2025-02-16 08:59:44.026892: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10
+2025-02-16 08:59:44.026911: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10
+2025-02-16 08:59:44.026930: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2025-02-16 08:59:44.034986: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0, 1, 2, 3, 4, 5, 6, 7
+2025-02-16 08:59:44.035042: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2025-02-16 08:59:44.038367: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102] Device interconnect StreamExecutor with strength 1 edge matrix:
+2025-02-16 08:59:44.038444: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1108]      0 1 2 3 4 5 6 7 
+2025-02-16 08:59:44.038475: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 0:   N N N N N N N N 
+2025-02-16 08:59:44.038505: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 1:   N N N N N N N N 
+2025-02-16 08:59:44.038534: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 2:   N N N N N N N N 
+2025-02-16 08:59:44.038562: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 3:   N N N N N N N N 
+2025-02-16 08:59:44.038591: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 4:   N N N N N N N N 
+2025-02-16 08:59:44.038619: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 5:   N N N N N N N N 
+2025-02-16 08:59:44.038647: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 6:   N N N N N N N N 
+2025-02-16 08:59:44.038674: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 7:   N N N N N N N N 
+2025-02-16 08:59:44.042801: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 22387 MB memory) -> physical GPU (device: 0, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:01:00.0, compute capability: 8.9)
+2025-02-16 08:59:44.043568: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:1 with 22387 MB memory) -> physical GPU (device: 1, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:23:00.0, compute capability: 8.9)
+2025-02-16 08:59:44.044287: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:2 with 22387 MB memory) -> physical GPU (device: 2, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:41:00.0, compute capability: 8.9)
+2025-02-16 08:59:44.045025: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:3 with 22387 MB memory) -> physical GPU (device: 3, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:61:00.0, compute capability: 8.9)
+2025-02-16 08:59:44.045733: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:4 with 22387 MB memory) -> physical GPU (device: 4, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:81:00.0, compute capability: 8.9)
+2025-02-16 08:59:44.046452: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:5 with 22387 MB memory) -> physical GPU (device: 5, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:a1:00.0, compute capability: 8.9)
+2025-02-16 08:59:44.047183: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:6 with 22387 MB memory) -> physical GPU (device: 6, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:c1:00.0, compute capability: 8.9)
+2025-02-16 08:59:44.047846: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:7 with 22387 MB memory) -> physical GPU (device: 7, name: NVIDIA GeForce RTX 4090, pci bus id: 0000:e1:00.0, compute capability: 8.9)
+Number of devices: 8
+Epoch 1 started.
+2025-02-16 09:01:22.634736: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2025-02-16 09:07:01.812255: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10
+Episode 20
+Episode 40
+Episode 60
+Episode 80
+Episode 100
+Episode 120
+Episode 140
+Episode 160
+Episode 180
+Episode 200
+Episode 220
+Episode 240
+Episode 260

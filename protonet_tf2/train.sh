@@ -1,0 +1,1 @@
+bash ./bin/protonet --mode train

@@ -14,12 +14,10 @@ class TrainEngine(object):
                                    'on_end_episode',
                                    'on_end']}
 
-    def train(self, loss_func, train_loader, val_loader, epochs, n_episodes, **kwargs):
-        # State of the training procedure
+    def train(self, train_loader, val_loader, epochs, n_episodes, **kwargs):
         state = {
             'train_loader': train_loader,
             'val_loader': val_loader,
-            'loss_func': loss_func,
             'sample': None,
             'epoch': 1,
             'total_episode': 1,
@@ -44,7 +42,6 @@ class TrainEngine(object):
             self.hooks['on_end_epoch'](state)
             state['epoch'] += 1
 
-            # Early stopping
             if state['early_stopping_triggered']:
                 print("Early stopping triggered!")
                 break

@@ -22,7 +22,7 @@ def preprocess_config(c):
 
 
 parser = argparse.ArgumentParser(description='Run training')
-parser.add_argument("--config", type=str, default="./src/config/config_imagenet.conf",
+parser.add_argument("--config", type=str, default="./src/config/config_omniglot.conf",
                     help="Path to the config file.")
 
 parser.add_argument("--data.dataset", type=str, default=None)

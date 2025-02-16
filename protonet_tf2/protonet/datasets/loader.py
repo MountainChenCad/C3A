@@ -1,5 +1,6 @@
 from .omniglot import load_omniglot
 from .mini_imagenet import load_mini_imagenet
+from .standforddogs import load_dogs
 
 def load(data_dir, config, splits):
     """
@@ -18,6 +19,14 @@ def load(data_dir, config, splits):
         ds = load_omniglot(data_dir, config, splits)
     elif config['data.dataset'] == "mini-imagenet":
         ds = load_mini_imagenet(data_dir, config, splits)
+    elif config['data.dataset'] == "standforddogs":
+        ds = load_dogs(data_dir, config, splits)
+    elif config['data.dataset'] == "cub":
+        ds = load_dogs(data_dir, config, splits)
+    elif config['data.dataset'] == "cars":
+        ds = load_dogs(data_dir, config, splits)
+    elif config['data.dataset'] == "cifar":
+        ds = load_dogs(data_dir, config, splits)
     else:
         raise ValueError(f"Unknow dataset: {config['data.dataset']}")
     return ds
